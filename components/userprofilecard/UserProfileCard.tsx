@@ -19,7 +19,7 @@ export function UserProfileCard({ inscriptionId }: { inscriptionId: string }) {
 
     // Utilisation de SWR pour le polling toutes les 5 secondes
     const { data, error } = useSWR(
-        ['https://nkymassyzvfwzrjekatr.supabase.co/functions/v1/get-user-participations', inscriptionId],
+        ['https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/get-user-participations', inscriptionId],
         ([url, id]) => fetcher(url, id),
         { refreshInterval: 5000 } // Rafraîchissement toutes les 5 secondes
     )

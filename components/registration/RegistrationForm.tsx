@@ -63,7 +63,7 @@ export function RegistrationForm() {
       setRegistrationId(storedId)
 
       // Vérifier la participation
-      fetch('https://nkymassyzvfwzrjekatr.supabase.co/functions/v1/participation', {
+      fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/inscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ export function RegistrationForm() {
   // Dans la fonction onSubmit du composant RegistrationForm
   async function onSubmit(data: FormValues) {
     try {
-      const res = await fetch('https://nkymassyzvfwzrjekatr.supabase.co/functions/v1/inscription', {
+      const res = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/inscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
