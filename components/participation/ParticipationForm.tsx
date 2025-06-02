@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase-client'
 import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
 const schema = z.object({
@@ -22,6 +23,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>
 
 export function ParticipationForm() {
+    const router = useRouter()
     const searchParams = useSearchParams()
     const [image, setImage] = useState<File | null>(null)
     const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -48,6 +50,9 @@ export function ParticipationForm() {
 
         if (id) {
             setInscriptionId(id)
+            if (idFromUrl && !idFromStorage) {
+                localStorage.setItem('inscription_id', idFromUrl) // ← ajoute ceci ici si tu veux
+            }
         } else {
             toast({
                 title: 'Erreur',
@@ -189,22 +194,32 @@ export function ParticipationForm() {
         setIsProcessing(true)
 
         try {
-            const { error } = await supabase.from('participation').insert([
-                {
+            const response = await fetch(`https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
                     inscription_id: inscriptionId,
                     image_url: uploadedImageUrl,
-                    ...values,
+                    ...values, // contient ton form.watch() (dont contient_menu_mxbo)
                     statut_validation: 'en attente',
-                    created_at: new Date().toISOString(),
-                },
-            ])
+                }),
+            })
 
-            if (error) throw error
+            const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Échec de l\'enregistrement')
+            }
 
             toast({
                 title: 'Succès',
                 description: 'Participation enregistrée',
             })
+
+            // 🔁 Passe l'id de participation en paramètre
+            router.push(`/game?id=${result.participation_id}`)
 
             form.reset()
             setImage(null)
@@ -214,7 +229,7 @@ export function ParticipationForm() {
         } catch (error) {
             toast({
                 title: 'Erreur',
-                description: 'Échec de l\'enregistrement',
+                description: error instanceof Error ? error.message : 'Erreur inconnue',
                 variant: 'destructive',
             })
         } finally {
@@ -292,7 +307,7 @@ export function ParticipationForm() {
                         Enregistrement...
                     </span>
                 ) : (
-                    'Valider la participation'
+                    'Tenter ma Chance'
                 )}
             </Button>
         </form>
