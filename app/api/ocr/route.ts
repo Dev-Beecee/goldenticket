@@ -33,15 +33,19 @@ export async function POST(req: NextRequest) {
                         content: [
                             {
                                 type: 'text',
-                                text: `Analysez ce ticket de caisse et retournez UNIQUEMENT un objet JSON avec:
-- ocr_nom_boutique (string)
-- ocr_date_achat (string au format JJ/MM/AAAA)
-- ocr_montant (string avec point comme séparateur décimal)
+                                text: `Analysez ce ticket de caisse et retournez UNIQUEMENT un objet JSON avec les champs suivants :
 
-Exemple: {
-  "ocr_nom_boutique": "Carrefour",
+- ocr_date_achat (format JJ/MM/AAAA)
+- ocr_heure_achat (format HH:MM)
+- ocr_montant (nombre en string, avec un point comme séparateur décimal)
+- contient_menu_mxbo (boolean) : true si "MXBO" ou "Best Of" est mentionné dans le ticket, sinon false
+
+Exemple :
+{
   "ocr_date_achat": "15/05/2023",
-  "ocr_montant": "42.50"
+  "ocr_heure_achat": "12:34",
+  "ocr_montant": "42.50",
+  "contient_menu_mxbo": true
 }`
                             },
                             {
