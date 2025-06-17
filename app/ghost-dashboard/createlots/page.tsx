@@ -19,6 +19,7 @@ type Lot = {
 type TypeLot = {
     id: string
     nom: string
+    priorite: number
 }
 
 export default function CreateLotsPage() {
