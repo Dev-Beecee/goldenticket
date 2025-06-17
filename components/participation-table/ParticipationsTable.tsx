@@ -47,9 +47,40 @@ export default function ParticipationsTable({
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     };
 
+    const exportToCSV = () => {
+        const headers = ["Boutique", "Nom", "Prénom", "Email", "Date", "Montant", "Statut"];
+        const csvRows = participations.map((participation) => [
+            `"${participation.boutique.nom}"`,
+            `"${participation.inscription.nom}"`,
+            `"${participation.inscription.prenom}"`,
+            `"${participation.inscription.email}"`,
+            `"${new Date(participation.ocr_date_achat).toLocaleDateString()}"`,
+            `"${participation.ocr_montant} €"`,
+            `"${participation.statut_validation}"`
+        ].join(','));
+
+        const csv = [headers.join(','), ...csvRows].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'participations.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="mb-12">
-            <h2 className="text-xl font-semibold mb-4">Participations</h2>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Participations</h2>
+                <button
+                    onClick={exportToCSV}
+                    className="px-4 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800"
+                >
+                    Exporter en CSV
+                </button>
+            </div>
+
             <div className="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -114,8 +145,8 @@ export default function ParticipationsTable({
                         onClick={handlePrevious}
                         disabled={currentPage === 1}
                         className={`px-4 py-2 text-sm font-medium rounded-md ${currentPage === 1
-                                ? "bg-gray-200 text-gray-500"
-                                : "bg-indigo-600 text-white hover:bg-indigo-700"
+                            ? "bg-gray-200 text-gray-500"
+                            : "bg-indigo-600 text-white hover:bg-indigo-700"
                             }`}
                     >
                         Précédent
@@ -129,8 +160,8 @@ export default function ParticipationsTable({
                         onClick={handleNext}
                         disabled={currentPage === totalPages}
                         className={`px-4 py-2 text-sm font-medium rounded-md ${currentPage === totalPages
-                                ? "bg-gray-200 text-gray-500"
-                                : "bg-indigo-600 text-white hover:bg-indigo-700"
+                            ? "bg-gray-200 text-gray-500"
+                            : "bg-indigo-600 text-white hover:bg-indigo-700"
                             }`}
                     >
                         Suivant

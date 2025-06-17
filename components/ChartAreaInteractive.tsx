@@ -7,6 +7,7 @@ import {
     CartesianGrid,
     XAxis,
 } from "recharts"
+import useSWR from "swr"
 
 import {
     Card,
@@ -33,19 +34,6 @@ import {
 
 export const description = "An interactive area chart showing event participation"
 
-const chartData = [
-    { date: "2024-06-01", inscriptions: 30, participations: 20 },
-    { date: "2024-06-02", inscriptions: 40, participations: 35 },
-    { date: "2024-06-03", inscriptions: 20, participations: 15 },
-    { date: "2024-06-04", inscriptions: 50, participations: 42 },
-    { date: "2024-06-05", inscriptions: 60, participations: 50 },
-    { date: "2024-06-06", inscriptions: 25, participations: 18 },
-    { date: "2024-06-07", inscriptions: 70, participations: 60 },
-    { date: "2024-06-08", inscriptions: 45, participations: 30 },
-    { date: "2024-06-09", inscriptions: 55, participations: 45 },
-    { date: "2024-06-10", inscriptions: 35, participations: 25 },
-]
-
 const chartConfig = {
     inscriptions: {
         label: "Inscriptions",
@@ -57,11 +45,17 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
+const fetcher = (url: string) => fetch(url).then(res => res.json())
+
 export function ChartAreaInteractive() {
     const [timeRange, setTimeRange] = React.useState("30d")
+    const { data, error, isLoading } = useSWR(
+        `https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/dashboard-participation?timeRange=${timeRange}`,
+        fetcher
+    )
 
-    // Logique potentielle pour filtrer plus tard
-    const filteredData = chartData // à remplacer selon le filtre
+    if (error) return <div>Erreur de chargement des données</div>
+    if (isLoading) return <div>Chargement...</div>
 
     return (
         <Card className="pt-0">
@@ -80,14 +74,23 @@ export function ChartAreaInteractive() {
                         <SelectValue placeholder="Last 30 days" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
-                        <SelectItem value="90d" className="rounded-lg">
-                            Derniers 3 mois
-                        </SelectItem>
-                        <SelectItem value="30d" className="rounded-lg">
-                            Derniers 30 jours
-                        </SelectItem>
                         <SelectItem value="7d" className="rounded-lg">
                             Derniers 7 jours
+                        </SelectItem>
+                        <SelectItem value="14d" className="rounded-lg">
+                            Dernières 2 semaines
+                        </SelectItem>
+                        <SelectItem value="30d" className="rounded-lg">
+                            Dernier mois
+                        </SelectItem>
+                        <SelectItem value="45d" className="rounded-lg">
+                            Dernier mois et demi
+                        </SelectItem>
+                        <SelectItem value="60d" className="rounded-lg">
+                            Derniers 2 mois
+                        </SelectItem>
+                        <SelectItem value="90d" className="rounded-lg">
+                            Derniers 3 mois
                         </SelectItem>
                     </SelectContent>
                 </Select>
@@ -97,7 +100,7 @@ export function ChartAreaInteractive() {
                     config={chartConfig}
                     className="aspect-auto h-[250px] w-full"
                 >
-                    <AreaChart data={filteredData}>
+                    <AreaChart data={data}>
                         <defs>
                             <linearGradient id="fillInscriptions" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="var(--color-inscriptions)" stopOpacity={0.8} />

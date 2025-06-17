@@ -29,12 +29,41 @@ export default function InscriptionsTable({ inscriptions }: InscriptionsTablePro
         if (currentPage > 1) setCurrentPage((prev) => prev - 1);
     };
 
+    const exportToCSV = () => {
+        const headers = ["Nom", "Prénom", "Email", "Téléphone", "Date d'inscription"];
+        const csvRows = inscriptions.map((inscription) => [
+            `"${inscription.nom}"`,
+            `"${inscription.prenom}"`,
+            `"${inscription.email}"`,
+            `"${inscription.telephone}"`,
+            `"${new Date(inscription.created_at).toLocaleDateString()}"`,
+        ].join(','));
+
+        const csv = [headers.join(','), ...csvRows].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'inscriptions.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentItems = inscriptions.slice(startIndex, startIndex + itemsPerPage);
 
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-4">Inscriptions</h2>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Inscriptions</h2>
+                <button
+                    onClick={exportToCSV}
+                    className="px-4 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-black"
+                >
+                    Exporter en CSV
+                </button>
+            </div>
+
             <div className="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -69,8 +98,8 @@ export default function InscriptionsTable({ inscriptions }: InscriptionsTablePro
                         onClick={handlePrevious}
                         disabled={currentPage === 1}
                         className={`px-4 py-2 text-sm font-medium rounded-md ${currentPage === 1
-                                ? "bg-gray-200 text-gray-500"
-                                : "bg-indigo-600 text-white hover:bg-indigo-700"
+                            ? "bg-gray-200 text-gray-500"
+                            : "bg-indigo-600 text-white hover:bg-indigo-700"
                             }`}
                     >
                         Précédent
@@ -84,8 +113,8 @@ export default function InscriptionsTable({ inscriptions }: InscriptionsTablePro
                         onClick={handleNext}
                         disabled={currentPage === totalPages}
                         className={`px-4 py-2 text-sm font-medium rounded-md ${currentPage === totalPages
-                                ? "bg-gray-200 text-gray-500"
-                                : "bg-indigo-600 text-white hover:bg-indigo-700"
+                            ? "bg-gray-200 text-gray-500"
+                            : "bg-indigo-600 text-white hover:bg-indigo-700"
                             }`}
                     >
                         Suivant
