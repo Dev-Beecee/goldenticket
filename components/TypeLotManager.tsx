@@ -31,7 +31,7 @@ export default function TypeLotManager({
             const res = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/type-lot')
             const json = await res.json()
             if (Array.isArray(json.data)) {
-                const sorted = json.data.sort((a, b) => a.priorite - b.priorite)
+                const sorted = json.data.sort((a: TypeLot, b: TypeLot) => a.priorite - b.priorite)
                 setTypeLots(sorted)
             } else {
                 setTypeLots([])
