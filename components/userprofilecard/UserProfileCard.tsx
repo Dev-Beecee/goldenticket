@@ -42,20 +42,28 @@ export function UserProfileCard({ inscriptionId }: { inscriptionId: string }) {
     return (
         <>
             {/* Carte centrée */}
-            <div className="flex justify-center">
+            <div className="w-full flex justify-center">
                 <div
                     onClick={() => setIsDialogOpen(true)}
-                    className="flex flex-col items-center p-6 rounded-lg shadow-md bg-white cursor-pointer hover:shadow-lg transition-shadow max-w-xs w-full"
+                    className="flex items-center justify-between bg-white rounded-2xl px-6 py-4 shadow cursor-pointer hover:shadow-md transition-shadow max-w-md w-full"
                 >
-                    <h3 className="text-xl font-semibold text-center">
-                        {formattedName}
-                    </h3>
-                    <p className="text-gray-500 mt-2">
-                        {data.user.participationsCount} participation{data.user.participationsCount !== 1 ? 's' : ''}
-                    </p>
-                    <button className="mt-4 text-blue-600 hover:underline">
-                        Voir détails
-                    </button>
+                    <div className="basis-[90%]">
+                        <h3 className="font-bold text-center">{formattedName}</h3>
+                        <p className="text-sm text-center text-black">
+                            {data.user.participationsCount} participations enregistrée{data.user.participationsCount !== 1 ? 's' : ''}.
+                        </p>
+                    </div>
+                    <div className="ml-4 text-black basis-[10%]">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
                 </div>
             </div>
 
@@ -63,12 +71,15 @@ export function UserProfileCard({ inscriptionId }: { inscriptionId: string }) {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle className="text-2xl">
-                            {formattedName} - {data.user.participationsCount} participation{data.user.participationsCount !== 1 ? 's' : ''}
+                        <DialogTitle className="text-2xl text-center ">
+                            {formattedName}
                         </DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-4 mt-4">
+                        <p className="text-sm text-center text-black">
+                            {data.user.participationsCount} participations enregistrée{data.user.participationsCount !== 1 ? 's' : ''}.
+                        </p>
                         {data.participations?.length > 0 ? (
                             data.participations.map((p: any) => (
                                 <div key={p.id} className="p-4 border rounded-lg hover:bg-gray-50">
@@ -83,7 +94,7 @@ export function UserProfileCard({ inscriptionId }: { inscriptionId: string }) {
                                                 })}
                                             </p>
                                         </div>
-                                        <span className="font-bold text-blue-600 text-lg">
+                                        <span className="text-black text-lg">
                                             {p.ocr_montant} €
                                         </span>
                                     </div>

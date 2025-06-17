@@ -239,18 +239,27 @@ export function ParticipationForm() {
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl mx-auto p-6 bg-white shadow rounded-lg mt-10">
-            <h2 className="text-xl font-semibold">Participer au jeu</h2>
-
-            {/* Image */}
+            <h2 className="text-xl font-semibold text-center">Je tente ma chance</h2>
+            <p className="text-center">Je joins une photo de mon ticket :</p>
+            {/* Photo du ticket */}
             <div className="space-y-2">
-                <Label htmlFor="ticket-upload">Photo du ticket *</Label>
-                <Input
-                    id="ticket-upload"
-                    type="file"
-                    accept="image/jpeg,image/png"
-                    onChange={handleImageChange}
-                    disabled={isProcessing}
-                />
+                <div className="w-full flex justify-center">
+                    <input
+                        id="ticket-upload"
+                        type="file"
+                        accept="image/jpeg,image/png"
+                        onChange={handleImageChange}
+                        disabled={isProcessing}
+                        className="hidden"
+                    />
+
+                    <label
+                        htmlFor="ticket-upload"
+                        className="cursor-pointer px-4 py-2 bg-white shadow text-black font-bold rounded-full inline-block"
+                    >
+                        SÉLECTIONNER UNE PHOTO
+                    </label>
+                </div>
                 {isProcessing && (
                     <div className="mt-2">
                         <div className="w-full bg-gray-200 rounded-full h-2.5">

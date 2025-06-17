@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase-client";
 import { useRouter } from "next/navigation";
 import InscriptionsTable from "@/components/inscription-table/InscriptionsTable";
 import ParticipationsTable from "@/components/participation-table/ParticipationsTable";
+import CreateRepartitionForm from "@/components/CreateRepartitionForm";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
@@ -197,6 +198,10 @@ export default function GhostDashboard() {
 
                     <InscriptionsTable inscriptions={filteredInscriptions} />
                 </div>
+                <div className="mb-8">
+                    <CreateRepartitionForm />
+                </div>
+
             </main>
 
             {/* Lightbox */}
