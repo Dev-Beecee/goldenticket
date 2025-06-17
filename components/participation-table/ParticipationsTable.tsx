@@ -5,7 +5,7 @@ import React, { useState } from "react";
 // Types
 type Participation = {
     id: string;
-    boutique: {
+    restaurant: {
         nom: string;
     };
     inscription: {
@@ -48,9 +48,9 @@ export default function ParticipationsTable({
     };
 
     const exportToCSV = () => {
-        const headers = ["Boutique", "Nom", "Prénom", "Email", "Date", "Montant", "Statut"];
+        const headers = ["Restaurant", "Nom", "Prénom", "Email", "Date", "Montant", "Statut"];
         const csvRows = participations.map((participation) => [
-            `"${participation.boutique.nom}"`,
+            `"${participation.restaurant.nom}"`,
             `"${participation.inscription.nom}"`,
             `"${participation.inscription.prenom}"`,
             `"${participation.inscription.email}"`,
@@ -86,7 +86,7 @@ export default function ParticipationsTable({
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Boutique</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Restaurant</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prénom</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
@@ -99,7 +99,7 @@ export default function ParticipationsTable({
                         <tbody className="bg-white divide-y divide-gray-200">
                             {currentItems.map((participation) => (
                                 <tr key={participation.id}>
-                                    <td className="px-6 py-4 text-sm text-gray-500">{participation.boutique.nom}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-500">{participation.restaurant?.nom || "Non renseigné"}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500">{participation.inscription.nom}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500">{participation.inscription.prenom}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500">{participation.inscription.email}</td>
@@ -117,6 +117,7 @@ export default function ParticipationsTable({
                                         >
                                             <option value="en attente">En attente</option>
                                             <option value="validé">Validé</option>
+                                            <option value="validéia">Validé IA</option>
                                             <option value="rejeté">Rejeté</option>
                                         </select>
                                     </td>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
-import DashboardLayout from "@/components/layouts/DashboardLayout"
+import DashboardLayout from "@/components/layouts/DashboardLayout";
 
 import ParticipationsTable from "@/components/participation-table/ParticipationsTable";
 import Lightbox from "yet-another-react-lightbox";
@@ -16,7 +16,7 @@ type Inscription = {
     email: string;
 };
 
-type Boutique = {
+type Restaurant = {
     id: string;
     nom: string;
 };
@@ -25,13 +25,12 @@ type Participation = {
     id: string;
     inscription_id: string;
     image_url: string | null;
-    ocr_nom_boutique: string;
     ocr_date_achat: string;
     ocr_montant: number;
-    boutique_id: string;
+    restaurant_id: string;
     statut_validation: string;
     created_at: string;
-    boutique: Boutique;
+    restaurant: Restaurant;
     inscription: Inscription;
 };
 
@@ -57,7 +56,7 @@ export default function ParticipationsPage() {
 
             const { data } = await supabase
                 .from("participation")
-                .select("*, boutique: boutique_id (id, nom), inscription: inscription_id (id, nom, prenom, email)")
+                .select("*, restaurant:restaurant_id (id, nom), inscription:inscription_id (id, nom, prenom, email)")
                 .order("created_at", { ascending: false });
 
             setParticipations((data as Participation[]) || []);
@@ -90,20 +89,22 @@ export default function ParticipationsPage() {
             p.inscription.email.toLowerCase().includes(term)
         );
     });
+
     const handleLogout = async () => {
         await supabase.auth.signOut();
         router.push("/login");
     };
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                Chargement...
+            </div>
+        );
     }
 
     return (
-
         <DashboardLayout>
-
-
             <h1 className="text-2xl font-bold mb-4 text-black">Liste des Participations</h1>
 
             <div className="mb-6">
@@ -123,16 +124,13 @@ export default function ParticipationsPage() {
                 setIsModalOpen={setIsModalOpen}
             />
 
-            {
-                isModalOpen && selectedImage && (
-                    <Lightbox
-                        open={isModalOpen}
-                        close={() => setIsModalOpen(false)}
-                        slides={[{ src: selectedImage }]}
-                    />
-                )
-            }
-        </DashboardLayout >
-
+            {isModalOpen && selectedImage && (
+                <Lightbox
+                    open={isModalOpen}
+                    close={() => setIsModalOpen(false)}
+                    slides={[{ src: selectedImage }]}
+                />
+            )}
+        </DashboardLayout>
     );
 }
