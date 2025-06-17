@@ -16,7 +16,14 @@ type Lot = {
     type_lot_id: string
 }
 
-export default function AjouterLotDialog() {
+
+
+type AjouterLotDialogProps = {
+    typesLot: TypeLot[];
+    onLotAdded: () => Promise<void>;
+};
+
+export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDialogProps) {
     const [open, setOpen] = useState(false)
     const [titre, setTitre] = useState('')
     const [typeLotId, setTypeLotId] = useState('')
