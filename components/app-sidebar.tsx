@@ -25,12 +25,20 @@ const data = {
       url: "#",
       items: [
         {
+          title: "Dashboard",
+          url: "/ghost-dashboard",
+        },
+        {
           title: "Inscriptions",
           url: "/ghost-dashboard/inscriptions",
         },
         {
           title: "Participations",
           url: "/ghost-dashboard/participations",
+        },
+        {
+          title: "Gagnants",
+          url: "/ghost-dashboard/gagnants",
         },
         {
           title: "Statistiques",

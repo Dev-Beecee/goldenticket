@@ -7,8 +7,13 @@ import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabase-client'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import { toast } from 'sonner'
 
-const PeriodeJeuForm = () => {
+type Props = {
+    onPeriodeIdChange?: (id: string) => void
+}
+
+const PeriodeJeuForm = ({ onPeriodeIdChange }: Props) => {
     const [dateDebut, setDateDebut] = useState('')
     const [dateFin, setDateFin] = useState('')
     const [loading, setLoading] = useState(false)
@@ -18,12 +23,18 @@ const PeriodeJeuForm = () => {
             const { data, error } = await supabase
                 .from('periode_jeu')
                 .select('*')
+                .order('date_debut', { ascending: false })
                 .limit(1)
                 .single()
 
             if (data) {
                 setDateDebut(data.date_debut?.slice(0, 16) || '')
                 setDateFin(data.date_fin?.slice(0, 16) || '')
+
+                // ✅ Envoie l'ID au parent si nécessaire
+                if (onPeriodeIdChange) {
+                    onPeriodeIdChange(data.id)
+                }
             }
 
             if (error) {
@@ -32,7 +43,7 @@ const PeriodeJeuForm = () => {
         }
 
         fetchPeriode()
-    }, [])
+    }, [onPeriodeIdChange])
 
     const handleSave = async () => {
         setLoading(true)
@@ -40,6 +51,7 @@ const PeriodeJeuForm = () => {
         const { data: existing } = await supabase
             .from('periode_jeu')
             .select('*')
+            .order('date_debut', { ascending: false })
             .limit(1)
             .maybeSingle()
 
@@ -52,9 +64,20 @@ const PeriodeJeuForm = () => {
             await supabase
                 .from('periode_jeu')
                 .update(payload)
-                .eq('id', existing.id) // 👈 Important : identifie la ligne à mettre à jour
+                .eq('id', existing.id)
+            toast.success('Période mise à jour')
         } else {
-            await supabase.from('periode_jeu').insert(payload)
+            const { data } = await supabase
+                .from('periode_jeu')
+                .insert(payload)
+                .select()
+                .single()
+
+            if (data && onPeriodeIdChange) {
+                onPeriodeIdChange(data.id)
+            }
+
+            toast.success('Période créée')
         }
 
         setLoading(false)

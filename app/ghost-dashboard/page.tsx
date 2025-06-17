@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase-client";
 import { useRouter } from "next/navigation";
-import InscriptionsTable from "@/components/inscription-table/InscriptionsTable";
-import ParticipationsTable from "@/components/participation-table/ParticipationsTable";
-import CreateRepartitionForm from "@/components/CreateRepartitionForm";
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
+import DashboardLayout from "@/components/layouts/DashboardLayout"
+import StatCard from "@/components/statistique/StatCard";
+import { ChartAreaInteractive } from "@/components/ChartAreaInteractive"
+import Image from "next/image"
+
 
 // Types
 type Inscription = {
@@ -138,80 +138,31 @@ export default function GhostDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                    <h1 className="text-3xl font-bold text-gray-900">Dashboard Admin</h1>
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                    >
-                        Déconnexion
-                    </button>
-                </div>
-            </header>
 
-            <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                <div className="px-4 py-6 sm:px-0">
-                    {/* Statistiques */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div className="bg-white overflow-hidden shadow rounded-lg">
-                            <div className="px-4 py-5 sm:p-6">
-                                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                                    Participations
-                                </h3>
-                                <p className="mt-2 text-3xl font-bold text-indigo-600">
-                                    {participationCount}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="bg-white overflow-hidden shadow rounded-lg">
-                            <div className="px-4 py-5 sm:p-6">
-                                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                                    Inscriptions
-                                </h3>
-                                <p className="mt-2 text-3xl font-bold text-indigo-600">
-                                    {inscriptionCount}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Barre de recherche */}
-                    <div className="mb-8">
-                        <input
-                            type="text"
-                            placeholder="Rechercher par nom, prénom ou email..."
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
 
-                    {/* Tables */}
-                    <ParticipationsTable
-                        participations={filteredParticipations}
-                        updateParticipationStatus={updateParticipationStatus}
-                        setSelectedImage={setSelectedImage}
-                        setIsModalOpen={setIsModalOpen}
+
+        <DashboardLayout>
+            <div className="flex flex-1 flex-col gap-4 p-4">
+                <div className="flex  gap-4 p-4 justify-center"> <Image src="/logo.svg" alt="Logo Rubeez" width={89} height={89} /></div>
+                <ChartAreaInteractive />
+                <div className="grid auto-rows-min gap-4 md:grid-cols-2">
+
+                    <StatCard
+                        title="Participations"
+                        value={participations.length}
+                        percentage={5.2}
+                        data={[100, 110, 105, 103, 115, 120, participations.length]}
                     />
-
-                    <InscriptionsTable inscriptions={filteredInscriptions} />
+                    <StatCard
+                        title="Inscriptions"
+                        value={inscriptions.length}
+                        percentage={3.1}
+                        data={[80, 95, 85, 90, 92, 100, inscriptions.length]}
+                    />
                 </div>
-                <div className="mb-8">
-                    <CreateRepartitionForm />
-                </div>
-
-            </main>
-
-            {/* Lightbox */}
-            {isModalOpen && selectedImage && (
-                <Lightbox
-                    open={isModalOpen}
-                    close={() => setIsModalOpen(false)}
-                    slides={[{ src: selectedImage }]}
-                />
-            )}
-        </div>
-    );
+            </div>
+        </DashboardLayout>
+    )
 }
+

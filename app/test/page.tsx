@@ -32,7 +32,7 @@ type Participation = {
 };
 
 
-export default function Test() {
+export default function GhostDashboard() {
     const [participations, setParticipations] = useState<Participation[]>([]);
     const [inscriptions, setInscriptions] = useState<Inscription[]>([]);
 
