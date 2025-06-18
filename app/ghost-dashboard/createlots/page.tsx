@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -7,6 +7,14 @@ import DashboardLayout from "@/components/layouts/DashboardLayout"
 import AjouterLotDialog from "@/components/AjouterLotDialog"
 import { Trash2 } from "lucide-react"
 import { toast } from "sonner"
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogHeader,
+    DialogTitle
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 type Lot = {
     id: string
@@ -14,6 +22,7 @@ type Lot = {
     type_valeur: string
     photo_url: string
     type_lot_id: string
+    instructions?: string
 }
 
 type TypeLot = {
@@ -40,12 +49,10 @@ export default function CreateLotsPage() {
             }
 
             try {
-                // Charger les types de lot en premier
                 const typesResponse = await fetch("https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/type-lot")
                 const { data: typesData } = await typesResponse.json()
                 setTypesLot(Array.isArray(typesData) ? typesData : [])
 
-                // Charger les lots ensuite
                 await fetchLots()
             } catch (error) {
                 console.error("Erreur de chargement:", error)
@@ -81,7 +88,6 @@ export default function CreateLotsPage() {
 
             if (!response.ok) throw new Error("Erreur lors de la suppression")
 
-            // Recharger la liste des lots après suppression
             await fetchLots()
             toast.success("Lot supprimé avec succès")
         } catch (error) {
@@ -90,7 +96,6 @@ export default function CreateLotsPage() {
         }
     }
 
-    // Fonction pour trouver le nom du type de lot
     const getTypeLotNom = (typeLotId: string) => {
         const typeLot = typesLot.find(type => type.id === typeLotId)
         return typeLot ? typeLot.nom : 'Type inconnu'
@@ -130,9 +135,26 @@ export default function CreateLotsPage() {
                             />
                             <h3 className="text-lg font-semibold">{lot.titre}</h3>
                             <p className="text-sm text-gray-500">{lot.type_valeur}</p>
-                            <p className="text-sm text-gray-500">
-                                Type: {getTypeLotNom(lot.type_lot_id)}
-                            </p>
+                            <p className="text-sm text-gray-500">Type: {getTypeLotNom(lot.type_lot_id)}</p>
+
+                            {lot.instructions && (
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="link" className="text-sm p-0 h-auto mt-2">
+                                            Voir les instructions de récupération
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-2xl">
+                                        <DialogHeader>
+                                            <DialogTitle>Instructions de récupération</DialogTitle>
+                                        </DialogHeader>
+                                        <div
+                                            className="prose max-w-full"
+                                            dangerouslySetInnerHTML={{ __html: lot.instructions }}
+                                        />
+                                    </DialogContent>
+                                </Dialog>
+                            )}
                         </div>
                     ))
                 ) : (

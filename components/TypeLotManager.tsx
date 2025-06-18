@@ -1,14 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+
+
 
 export type TypeLot = {
     id: string
     nom: string
     priorite: number
+    instructions?: string
 }
 
 type Props = {
@@ -25,6 +29,7 @@ export default function TypeLotManager({
     const [typeLots, setTypeLots] = useState<TypeLot[]>([])
     const [newTypeNom, setNewTypeNom] = useState('')
     const [newPriorite, setNewPriorite] = useState<number>(1)
+    const [instructions, setInstructions] = useState('')
 
     const fetchTypeLots = async () => {
         try {
@@ -51,7 +56,11 @@ export default function TypeLotManager({
         const res = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/type-lot', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nom: newTypeNom, priorite: newPriorite })
+            body: JSON.stringify({
+                nom: newTypeNom,
+                priorite: newPriorite,
+                instructions: instructions
+            })
         })
         const json = await res.json()
         if (res.ok && json.data?.id) {
@@ -94,7 +103,9 @@ export default function TypeLotManager({
                 onChange={(e) => setNewPriorite(parseInt(e.target.value))}
             />
 
-            <Button type="button" onClick={handleCreateTypeLot}>
+
+
+            <Button type="button" onClick={handleCreateTypeLot} className="mt-2">
                 Ajouter
             </Button>
 

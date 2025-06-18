@@ -1,13 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import TypeLotManager, { TypeLot } from './TypeLotManager'
+
+// Éditeur chargé côté client uniquement
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
+import 'react-quill/dist/quill.snow.css'
 
 type Lot = {
     id: string
@@ -15,8 +19,6 @@ type Lot = {
     photo_url: string
     type_lot_id: string
 }
-
-
 
 type AjouterLotDialogProps = {
     typesLot: TypeLot[];
@@ -26,6 +28,7 @@ type AjouterLotDialogProps = {
 export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDialogProps) {
     const [open, setOpen] = useState(false)
     const [titre, setTitre] = useState('')
+    const [instructions, setInstructions] = useState('')
     const [typeLotId, setTypeLotId] = useState('')
     const [typeLots, setTypeLots] = useState<TypeLot[]>([])
     const [file, setFile] = useState<File | null>(null)
@@ -69,12 +72,14 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
             const res = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/lots', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ titre, photo_url, type_lot_id: typeLotId })
+                body: JSON.stringify({ titre, photo_url, type_lot_id: typeLotId, instructions })
             })
             if (!res.ok) throw new Error('Erreur création lot')
 
             await fetchLots()
+            await onLotAdded() // ← ajoute cette ligne
             setTitre('')
+            setInstructions('')
             setTypeLotId('')
             setFile(null)
             setOpen(false)
@@ -93,7 +98,7 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
                     <DialogTrigger asChild>
                         <Button>Ajouter un lot</Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
+                    <DialogContent className="sm:max-w-2xl w-full">
                         <DialogHeader>
                             <DialogTitle>Ajouter un lot</DialogTitle>
                         </DialogHeader>
@@ -119,19 +124,27 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
                                         </SelectContent>
                                     </Select>
 
-                                    <Popover>
-                                        <PopoverTrigger asChild>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
                                             <Button type="button" variant="outline">+</Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-64">
+                                        </DialogTrigger>
+                                        <DialogContent className="max-w-3xl w-full">
+                                            <DialogHeader>
+                                                <DialogTitle>Gérer les types de lots</DialogTitle>
+                                            </DialogHeader>
                                             <TypeLotManager
                                                 selectedTypeLotId={typeLotId}
                                                 setSelectedTypeLotId={setTypeLotId}
                                                 onChange={fetchTypeLots}
                                             />
-                                        </PopoverContent>
-                                    </Popover>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
+                            </div>
+
+                            <div>
+                                <Label>Instructions (optionnel)</Label>
+                                <ReactQuill value={instructions} onChange={setInstructions} />
                             </div>
 
                             <div>
