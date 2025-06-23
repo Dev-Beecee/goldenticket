@@ -12,6 +12,9 @@ export default function GamePage() {
     const [isLoading, setIsLoading] = useState(true)
     const [accessDenied, setAccessDenied] = useState(false)
     const [scratchReady, setScratchReady] = useState(false)
+    const [imageResult, setImageResult] = useState('/perdu.jpeg')
+    const [lotInstructions, setLotInstructions] = useState('')
+    const [lotLoaded, setLotLoaded] = useState(false)
 
 
     // Récupération de l'ID
@@ -33,7 +36,6 @@ export default function GamePage() {
 
     // Vérification API
     useEffect(() => {
-        console.log('🔍 Vérification API lancée...')
         const participationId = searchParams.get('id')
         if (!participationId) return
 
@@ -44,30 +46,60 @@ export default function GamePage() {
         })
             .then(res => res.json())
             .then(res => {
-                console.log('✅ Réponse API =', res)
                 if (res.access === true) {
-                    // Tout est OK, on attend le containerRef pour init scratch
+                    // OK
                 } else {
-                    console.log('❌ Accès refusé par l’API')
                     setAccessDenied(true)
                     setIsLoading(false)
                 }
             })
-            .catch(err => {
-                console.error('❌ Erreur API :', err)
+            .catch(() => {
                 setAccessDenied(true)
                 setIsLoading(false)
             })
     }, [searchParams])
 
-    // Initialisation ScratchCard
+    // Lancer la fonction de tirage dès que containerRef est prêt
     useEffect(() => {
-        if (!scratchReady) return
+        const participationId = searchParams.get('id')
+        if (!scratchReady || !participationId) return
 
-        console.log('🧩 scratchReady = true → lancement de initScratchCard()')
+        const run = async () => {
+            try {
+                const res = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/attribuer-lot-force-gain', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ participation_id: participationId }),
+                });
+
+                const result = await res.json();
+
+                if (result.gain) {
+                    setImageResult(result.lot.image || '/images/gagne.jpeg');
+                    setLotInstructions(result.lot.instructions || '');
+
+
+                    // ✅ L’envoi de l’email est maintenant géré côté serveur.
+                } else {
+                    setImageResult(result.image || '/images/perdu.jpeg');
+                }
+
+                setLotLoaded(true);
+            } catch (e) {
+                console.error('❌ Erreur lors de l’appel attribuer-lot:', e);
+                setImageResult('/images/perdu.jpeg');
+                setLotLoaded(true);
+            }
+        }
+
+        run()
+    }, [scratchReady, searchParams])
+
+    // Initialisation ScratchCard avec image dynamique une fois le lot prêt
+    useEffect(() => {
+        if (!scratchReady || !lotLoaded) return
 
         const init = async () => {
-            console.log('🎯 initScratchCard appelé')
             try {
                 const container = containerRef.current
                 if (!container) throw new Error('Conteneur null')
@@ -79,17 +111,21 @@ export default function GamePage() {
                     containerWidth: container.offsetWidth,
                     containerHeight: 300,
                     imageForwardSrc: '/header.png',
-                    imageBackgroundSrc: '/perdu.jpeg',
+                    imageBackgroundSrc: imageResult,
                     htmlBackground: '',
-                    brushSrc: '/perdu.jpeg',
+                    brushSrc: imageResult,
                     clearZoneRadius: 50,
                     nPoints: 30,
                     pointSize: 4,
                     enabledPercentUpdate: true,
                     percentToFinish: 50,
                     callback: () => {
-                        alert('Bravo ! Vous avez gratté assez pour révéler le résultat.')
-                    },
+                        if (lotInstructions !== null && inscriptionId) {
+                            alert(`Félicitations ! Tu as gagné !\n\nInstructions : ${lotInstructions}`)
+                        } else {
+                            alert('Dommage, réessaye demain !')
+                        }
+                    }
                 })
 
                 await sc.init()
@@ -102,15 +138,14 @@ export default function GamePage() {
                 })
             } catch (e) {
                 console.error('❌ initScratchCard error:', e)
-                alert('Erreur lors de l\'initialisation')
+                alert('Erreur lors de l\'initialisation du jeu.')
                 setIsLoading(false)
             }
         }
 
         setTimeout(init, 100)
-    }, [scratchReady])
+    }, [scratchReady, lotLoaded, imageResult])
 
-    // Affichage final
     return (
         <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
             {accessDenied ? (
@@ -126,7 +161,6 @@ export default function GamePage() {
                         ref={(ref) => {
                             containerRef.current = ref
                             if (ref) {
-                                console.log('✅ containerRef ready')
                                 setScratchReady(true)
                             }
                         }}

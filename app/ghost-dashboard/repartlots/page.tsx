@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase-client'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
-import PeriodeJeuForm from '@/components/periodejeu/PeriodeJeuForm'
+import PeriodeJeuForm from '@/components/PeriodeJeuForm'
 import RepartitionLauncher from '@/components/RepartitionLauncher'
 import TableauRepartition from '@/components/TableauRepartition'
 
