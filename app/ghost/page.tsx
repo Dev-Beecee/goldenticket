@@ -23,7 +23,7 @@ export default function Login() {
 
         try {
             if (!email.endsWith("@beecee.fr")) {
-                throw new Error("Seuls les emails @beecee.fr sont autorisés")
+                throw new Error("Vous êtes pas autorisé a vous connecter")
             }
 
             const { data, error: authError } = await supabase.auth.signInWithPassword({
