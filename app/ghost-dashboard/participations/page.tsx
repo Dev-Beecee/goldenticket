@@ -1,13 +1,13 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase-client";
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { Database } from "@/types/database"
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 
-import ParticipationsTable from "@/components/participation-table/ParticipationsTable";
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
+import ParticipationsTableWrapper from "@/components/ParticipationsTableWrapper"
+import SearchBar from "@/components/SearchBar"
+import QuickValidationCarouselWrapper from "@/components/QuickValidationCarouselWrapper"
+import { checkPermission } from "@/lib/server/permit-wrapper"
 
 type Inscription = {
     id: string;
@@ -34,103 +34,54 @@ type Participation = {
     inscription: Inscription;
 };
 
-export default function ParticipationsPage() {
-    const router = useRouter();
-    const [participations, setParticipations] = useState<Participation[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [collapsed, setCollapsed] = useState(false);
+export default async function ParticipationsPage({
+    searchParams,
+}: {
+    searchParams?: { [key: string]: string | string[] | undefined }
+}) {
+    const cookieStore = cookies()
+    const supabase = createServerComponentClient<Database>({ cookies: () => cookieStore })
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
+    const {
+        data: { user },
+        error
+    } = await supabase.auth.getUser()
 
-            if (!user || !user.email?.endsWith("@beecee.fr")) {
-                router.push("/login");
-                return;
-            }
-
-            const { data } = await supabase
-                .from("participation")
-                .select("*, restaurant:restaurant_id (id, nom), inscription:inscription_id (id, nom, prenom, email)")
-                .order("created_at", { ascending: false });
-
-            setParticipations((data as Participation[]) || []);
-            setLoading(false);
-        };
-
-        fetchData();
-    }, [router]);
-
-    const updateParticipationStatus = async (id: string, newStatus: string) => {
-        const { error } = await supabase
-            .from("participation")
-            .update({ statut_validation: newStatus })
-            .eq("id", id);
-
-        if (!error) {
-            setParticipations((prev) =>
-                prev.map((p) =>
-                    p.id === id ? { ...p, statut_validation: newStatus } : p
-                )
-            );
-        }
-    };
-
-    const filteredParticipations = participations.filter((p) => {
-        const term = searchTerm.toLowerCase();
-        return (
-            p.inscription.nom.toLowerCase().includes(term) ||
-            p.inscription.prenom.toLowerCase().includes(term) ||
-            p.inscription.email.toLowerCase().includes(term)
-        );
-    });
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        router.push("/login");
-    };
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                Chargement...
-            </div>
-        );
+    if (error || !user) {
+        redirect("/unauthorized")
     }
+
+    const hasPermission = await checkPermission(user.id, "read", "participation")
+
+    if (!hasPermission) {
+        redirect("/unauthorized")
+    }
+
+    // Récupération des données
+    const { data: participations } = await supabase
+        .from("participation")
+        .select("*, restaurant:restaurant_id (id, nom), inscription:inscription_id (id, nom, prenom, email)")
+        .order("created_at", { ascending: false })
+
+    const searchTerm = searchParams?.search?.toString().toLowerCase() || ""
+
+    const filteredParticipations = participations?.filter((p) =>
+        p.inscription.nom.toLowerCase().includes(searchTerm) ||
+        p.inscription.prenom.toLowerCase().includes(searchTerm) ||
+        p.inscription.email.toLowerCase().includes(searchTerm)
+    ) || []
 
     return (
         <DashboardLayout>
             <h1 className="text-2xl font-bold mb-4 text-black">Liste des Participations</h1>
 
-            <div className="mb-6">
-                <input
-                    type="text"
-                    placeholder="Rechercher par nom, prénom ou email..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+            <SearchBar placeholder="Rechercher par nom, prénom ou email..." />
+
+            <QuickValidationCarouselWrapper participations={filteredParticipations} />
+
+            <div className="mt-10">
+                <ParticipationsTableWrapper participations={filteredParticipations} />
             </div>
-
-            <ParticipationsTable
-                participations={filteredParticipations}
-                updateParticipationStatus={updateParticipationStatus}
-                setSelectedImage={setSelectedImage}
-                setIsModalOpen={setIsModalOpen}
-            />
-
-            {isModalOpen && selectedImage && (
-                <Lightbox
-                    open={isModalOpen}
-                    close={() => setIsModalOpen(false)}
-                    slides={[{ src: selectedImage }]}
-                />
-            )}
         </DashboardLayout>
     );
 }

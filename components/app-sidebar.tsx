@@ -52,6 +52,14 @@ const data = {
           title: "Répartition des lots",
           url: "/ghost-dashboard/repartlots",
         },
+        {
+          title: "Création utilisateur",
+          url: "/ghost-dashboard/creer-utilisateur",
+        },
+        {
+          title: "Réglages",
+          url: "/ghost-dashboard/reglage",
+        },
       ],
     },
 

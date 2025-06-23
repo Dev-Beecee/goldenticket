@@ -33,17 +33,15 @@ export async function POST(req: NextRequest) {
                         content: [
                             {
                                 type: 'text',
-                                text: `Analysez ce ticket de caisse et retournez UNIQUEMENT un objet JSON avec les champs suivants :
+                                text: `Analysez ce ticket de caisse et retournez UNIQUEMENT un objet JSON avec:
+- ocr_restaurant (string)
+- ocr_date_achat (string au format JJ/MM/AAAA ou JJ/MM/AA, attention : "21/06/25" signifie 21 juin 2025, pas 2021)
+- ocr_montant (string avec point comme séparateur décimal)
+-contient_menu_mxbo (boolean, true si le ticket mentionne un menu MXBO, Best Of ou BO, false sinon)
 
-- ocr_date_achat (format JJ/MM/AAAA)
-- ocr_heure_achat (format HH:MM)
-- ocr_montant (nombre en string, avec un point comme séparateur décimal)
-- contient_menu_mxbo (boolean) : true si "MXBO" ou "Best Of" est mentionné dans le ticket, sinon false
-
-Exemple :
-{
+Exemple: {
+  "ocr_restaurant": "Carrefour",
   "ocr_date_achat": "15/05/2023",
-  "ocr_heure_achat": "12:34",
   "ocr_montant": "42.50",
   "contient_menu_mxbo": true
 }`
@@ -81,6 +79,15 @@ Exemple :
 
         try {
             const parsedContent = JSON.parse(content)
+            // Corriger la date si l'année semble être au format à 2 chiffres (ex : 25 au lieu de 2025)
+            if (parsedContent.ocr_date_achat) {
+                const [jour, mois, annee] = parsedContent.ocr_date_achat.split('/')
+                if (annee.length === 2) {
+                    const yearInt = parseInt(annee, 10)
+                    const correctedYear = yearInt < 50 ? `20${annee}` : `19${annee}`
+                    parsedContent.ocr_date_achat = `${jour}/${mois}/${correctedYear}`
+                }
+            }
             return NextResponse.json(parsedContent)
         } catch (parseError) {
             console.error('Erreur de parsing:', parseError)

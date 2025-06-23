@@ -144,10 +144,10 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
 
                             <div>
                                 <Label>Instructions (optionnel)</Label>
-                                <ReactQuill value={instructions} onChange={setInstructions} />
+                                <ReactQuill value={instructions} onChange={setInstructions} style={{ height: "250px" }} />
                             </div>
 
-                            <div>
+                            <div className="py-4 mt-8">
                                 <Label>Image</Label>
                                 <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
                             </div>
@@ -161,6 +161,6 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
                     </DialogContent>
                 </Dialog>
             </div>
-        </div>
+        </div >
     )
 }

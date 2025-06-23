@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -9,18 +9,32 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase-client'
-import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import {
+    Command,
+    CommandInput,
+    CommandEmpty,
+    CommandGroup,
+    CommandItem,
+} from '@/components/ui/command'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover'
+import { Check, ChevronsUpDown, Loader2, XCircle, CheckCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const schema = z.object({
+    ocr_restaurant: z.string().min(2, { message: 'Minimum 2 caractères requis' }),
     ocr_date_achat: z.string().min(6, { message: 'Date invalide' }),
-    ocr_heure_achat: z.string().min(4, { message: 'Heure invalide' }),
     ocr_montant: z.string().min(1, { message: 'Montant requis' }),
-    contient_menu_mxbo: z.boolean().optional(),
+    contient_menu_mxbo: z.boolean(),
+    restaurant_id: z.string().optional(),
 })
 
 type FormValues = z.infer<typeof schema>
+type Restaurant = { id: string; nom: string }
 
 export function ParticipationForm() {
     const router = useRouter()
@@ -28,145 +42,285 @@ export function ParticipationForm() {
     const [image, setImage] = useState<File | null>(null)
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
+    const [restaurants, setRestaurants] = useState<Restaurant[]>([])
     const [inscriptionId, setInscriptionId] = useState<string | null>(null)
     const [isProcessing, setIsProcessing] = useState(false)
+    const [showRestaurantSelect, setShowRestaurantSelect] = useState(false)
+    const [searchTerm, setSearchTerm] = useState('')
+    const [open, setOpen] = useState(false)
     const [uploadProgress, setUploadProgress] = useState(0)
+    const [autoDetectedRestaurant, setAutoDetectedRestaurant] = useState<Restaurant | null>(null);
+    const [ocrCompleted, setOcrCompleted] = useState(false);
     const { toast } = useToast()
 
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: {
+            ocr_restaurant: '',
             ocr_date_achat: '',
-            ocr_heure_achat: '',
             ocr_montant: '',
             contient_menu_mxbo: false,
+            restaurant_id: '',
         },
     })
 
+    // Récupération de l'ID d'inscription
     useEffect(() => {
         const idFromUrl = searchParams.get('id')
         const idFromStorage = localStorage.getItem('inscription_id')
         const id = idFromUrl || idFromStorage
 
         if (id) {
+            console.log('Inscription ID found:', id)
             setInscriptionId(id)
-            if (idFromUrl && !idFromStorage) {
-                localStorage.setItem('inscription_id', idFromUrl) // ← ajoute ceci ici si tu veux
-            }
         } else {
+            console.error('No inscription ID found')
             toast({
-                title: 'Erreur',
-                description: 'Vous devez vous inscrire avant de participer',
-                variant: 'destructive',
+                variant: 'default',
+                duration: 5000,
+                className: 'bg-[#FF0000] border-2 border-white text-white rounded-[16px] shadow-md px-4 py-3',
+                description: (
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-8 h-8 border-2 border-[#FFB700] bg-[#FF5400] rounded-full">
+                            <XCircle className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold">Vous devez vous inscrire avant de participer</span>
+                    </div>
+                ),
             })
         }
     }, [searchParams, toast])
 
+    // Chargement des restaurants
+    useEffect(() => {
+        const fetchRestaurants = async () => {
+            try {
+                console.log('Fetching restaurants...')
+                const response = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/list-restaurant', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                })
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+
+                const data = await response.json()
+                console.log('Restaurants loaded:', data.restaurants?.length || 0)
+                setRestaurants(data.restaurants || [])
+            } catch (error) {
+                console.error('Error fetching restaurants:', error)
+                toast({
+                    variant: 'default',
+                    duration: 5000,
+                    className: 'bg-[#FF0000] border-2 border-white text-white rounded-[16px] shadow-md px-4 py-3',
+                    description: (
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center w-8 h-8 border-2 border-[#FFB700] bg-[#FF5400] rounded-full">
+                                <XCircle className="w-5 h-5 text-white" />
+                            </div>
+                            <span className="font-semibold">Impossible de charger la liste des restaurants</span>
+                        </div>
+                    ),
+                })
+            }
+        }
+
+        fetchRestaurants()
+    }, [toast])
+
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file || !inscriptionId) return
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!inscriptionId) {
+            toast({
+                title: 'Erreur',
+                description: 'ID utilisateur manquant',
+                variant: 'destructive',
+            });
+            return;
+        }
 
         if (!file.type.match(/image\/(jpeg|png|jpg)/)) {
             toast({
                 title: 'Format non supporté',
                 description: 'Veuillez sélectionner une image JPEG ou PNG',
                 variant: 'destructive',
-            })
-            return
+            });
+            return;
         }
 
         if (file.size > 5 * 1024 * 1024) {
             toast({
                 title: 'Fichier trop volumineux',
-                description: 'Max 5MB',
+                description: 'Veuillez sélectionner une image de moins de 5MB',
                 variant: 'destructive',
-            })
-            return
+            });
+            return;
         }
 
-        setIsProcessing(true)
-        setUploadProgress(0)
+        setIsProcessing(true);
+        setUploadProgress(0);
+        setOcrCompleted(false);
 
         try {
+            // Prévisualisation
             const preview = await new Promise<string>((resolve, reject) => {
-                const reader = new FileReader()
-                reader.onload = () => resolve(reader.result as string)
-                reader.onerror = () => reject(new Error('Erreur de lecture du fichier'))
-                reader.readAsDataURL(file)
-            })
-            setImagePreview(preview)
-            setImage(file)
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = () => reject(new Error('Erreur de lecture du fichier'));
+                reader.readAsDataURL(file);
+            });
+            setImagePreview(preview);
+            setImage(file);
 
-            const fileExt = file.name.split('.').pop()
-            const fileName = `${inscriptionId}-${Date.now()}.${fileExt}`
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${inscriptionId}-${Date.now()}.${fileExt}`;
 
-            const { error: uploadError } = await supabase.storage
-                .from('tickets')
-                .upload(fileName, file, {
-                    cacheControl: '3600',
-                    upsert: false,
-                })
+            // 🔗 Étape 1 : Obtenir l'URL pré-signée
+            const signedUrlRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/presigned-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: fileName,
+                    type: file.type,
+                }),
+            });
 
-            if (uploadError) throw uploadError
+            if (!signedUrlRes.ok) {
+                throw new Error('Impossible de récupérer l’URL pré-signée');
+            }
 
-            const { data: { publicUrl } } = supabase.storage
-                .from('tickets')
-                .getPublicUrl(fileName)
+            const { uploadUrl, fileUrl } = await signedUrlRes.json();
 
-            if (!publicUrl) throw new Error('Échec de génération URL publique')
+            // 🔼 Étape 2 : Upload direct vers S3
+            const uploadRes = await fetch(uploadUrl, {
+                method: 'PUT',
+                headers: { 'Content-Type': file.type },
+                body: file,
+            });
 
-            setUploadedImageUrl(publicUrl)
-            await autoFillWithOCR(publicUrl)
+            if (!uploadRes.ok) {
+                throw new Error('Échec de l’upload vers S3');
+            }
+
+            setUploadedImageUrl(fileUrl);
+
+            // 🧠 Étape 3 : Appel OCR avec l’URL publique
+            await autoFillWithOCR(fileUrl);
 
             toast({
                 title: 'Succès',
                 description: 'Image analysée avec succès',
-            })
-
+                variant: 'default',
+            });
         } catch (error) {
+            console.error('Erreur upload/image:', error);
             toast({
                 title: 'Erreur',
-                description: error instanceof Error ? error.message : 'Échec du traitement',
+                description: error instanceof Error ? error.message : 'Erreur lors de l’upload',
                 variant: 'destructive',
-            })
+            });
         } finally {
-            setIsProcessing(false)
-            setUploadProgress(100)
+            setIsProcessing(false);
+            setUploadProgress(100);
         }
-    }
+    };
 
+
+    const findMatchingRestaurant = useCallback((restaurantName: string) => {
+        if (!restaurantName) return undefined;
+
+        // Nettoyage du nom pour une meilleure correspondance
+        const cleanedInput = restaurantName.toLowerCase().trim();
+
+        return restaurants.find(r => {
+            const cleanedRestaurant = r.nom.toLowerCase().trim();
+            // Correspondance exacte ou partielle
+            return cleanedRestaurant === cleanedInput ||
+                cleanedRestaurant.includes(cleanedInput) ||
+                cleanedInput.includes(cleanedRestaurant);
+        });
+    }, [restaurants]);
+
+    // Auto-remplissage avec OCR
     const autoFillWithOCR = useCallback(async (imageUrl?: string) => {
-        const urlToUse = imageUrl || uploadedImageUrl
-        if (!urlToUse) throw new Error('URL de l\'image manquante pour l\'analyse OCR')
+        const urlToUse = imageUrl || uploadedImageUrl;
+
+        if (!urlToUse) {
+            console.error('Erreur critique: uploadedImageUrl non défini');
+            throw new Error('URL de l\'image manquante pour l\'analyse OCR');
+        }
 
         try {
-            setIsProcessing(true)
+            setIsProcessing(true);
             const response = await fetch('/api/ocr', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ imageUrl: urlToUse }),
-            })
+            });
 
             if (!response.ok) {
-                const errorText = await response.text()
-                throw new Error(`Erreur OCR: ${response.status} - ${errorText}`)
+                const errorText = await response.text();
+                throw new Error(`Erreur OCR: ${response.status} - ${errorText}`);
             }
 
-            const extracted = await response.json()
+            const extracted = await response.json();
 
+            // Validation de la réponse
+            if (!extracted || typeof extracted !== 'object') {
+                throw new Error('Réponse OCR invalide');
+            }
+
+            // Mise à jour du formulaire
             form.reset({
+                ocr_restaurant: extracted.ocr_restaurant || '',
                 ocr_date_achat: extracted.ocr_date_achat ? convertToHTMLDate(extracted.ocr_date_achat) : '',
-                ocr_heure_achat: extracted.ocr_heure_achat || '',
-                ocr_montant: extracted.ocr_montant?.replace(',', '.').replace(/\s/g, '') || '',
-                contient_menu_mxbo: !!extracted.contient_menu_mxbo,
-            })
+                ocr_montant: extracted.ocr_montant ? extracted.ocr_montant.replace(',', '.').replace(/\s/g, '') : '',
+                contient_menu_mxbo: extracted.contient_menu_mxbo || false,
+                restaurant_id: ''
+            });
 
+            if (extracted.ocr_restaurant) {
+                const match = findMatchingRestaurant(extracted.ocr_restaurant);
+
+                if (match) {
+                    console.log('Match found, hiding selector');
+                    form.setValue('restaurant_id', match.id);
+                    setAutoDetectedRestaurant(match);
+                    setShowRestaurantSelect(false); // Cache le sélecteur si correspondance exacte
+                } else {
+                    console.log('No match found, showing selector');
+                    setAutoDetectedRestaurant(null);
+                    setShowRestaurantSelect(true); // Affiche le sélecteur si pas de correspondance
+                    setSearchTerm(extracted.ocr_restaurant);
+                }
+            } else {
+                console.log('No restaurant detected, showing selector');
+                setAutoDetectedRestaurant(null);
+                setShowRestaurantSelect(true); // Affiche le sélecteur si aucun nom détecté
+                setSearchTerm('');
+            }
+
+            // Marquer l'OCR comme terminé
+            setOcrCompleted(true);
         } catch (error) {
-            throw error
+            console.error('Erreur OCR:', error);
+            throw error;
         } finally {
-            setIsProcessing(false)
+            setIsProcessing(false);
         }
-    }, [uploadedImageUrl, form])
+    }, [uploadedImageUrl, form, findMatchingRestaurant]);
+
+    const filteredRestaurants = useMemo(() => {
+        return restaurants.filter(r =>
+            r.nom.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    }, [restaurants, searchTerm])
 
     function convertToHTMLDate(dateStr: string): string {
         if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr
@@ -186,15 +340,40 @@ export function ParticipationForm() {
             toast({
                 title: 'Erreur',
                 description: 'Image ou ID manquant',
-                variant: 'destructive',
-            })
-            return
+                variant: 'destructive'
+            });
+            return;
         }
 
-        setIsProcessing(true)
+        setIsProcessing(true);
 
         try {
-            const response = await fetch(`https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation`, {
+            // ✅ Vérifie la validité de la date via l'Edge Function
+            const checkRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/check-periode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ocr_date_achat: values.ocr_date_achat }),
+            });
+
+            if (!checkRes.ok) {
+                const result = await checkRes.json();
+                console.log('📛 Réponse Edge Function:', result);
+                toast({
+                    title: 'Date invalide',
+                    description: result?.error
+                        ? result.error
+                        : "La date d'achat ne correspond pas à la période du jeu. Veuillez vérifier votre ticket.",
+                    variant: 'destructive',
+                });
+
+                setIsProcessing(false);
+                return;
+            }
+
+            // ✅ Enregistre la participation via la nouvelle Edge Function
+            const participationRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -202,45 +381,60 @@ export function ParticipationForm() {
                 body: JSON.stringify({
                     inscription_id: inscriptionId,
                     image_url: uploadedImageUrl,
-                    ...values, // contient ton form.watch() (dont contient_menu_mxbo)
-                    statut_validation: 'en attente',
+                    ...values,
                 }),
-            })
+            });
 
-            const result = await response.json()
-
-            if (!response.ok) {
-                throw new Error(result.error || 'Échec de l\'enregistrement')
+            if (!participationRes.ok) {
+                const error = await participationRes.json();
+                throw new Error(error.message || 'Erreur lors de l\'enregistrement');
             }
 
-            toast({
-                title: 'Succès',
-                description: 'Participation enregistrée',
-            })
+            const result = await participationRes.json();
 
-            // 🔁 Passe l'id de participation en paramètre
-            router.push(`/game?id=${result.participation_id}`)
+            // ✅ Redirection ou message selon contient_menu_mxbo
+            if (values.contient_menu_mxbo) {
+                router.push(`/game?id=${result.participation_id}`);
+            } else {
+                toast({
+                    title: 'Désolé',
+                    description: 'Votre ticket ne contient pas de menu MXBO, vous ne pouvez pas participer au jeu',
+                    variant: 'destructive',
+                });
+            }
 
-            form.reset()
-            setImage(null)
-            setImagePreview(null)
-            setUploadedImageUrl(null)
+            // Reset
+            form.reset({
+                ocr_restaurant: '',
+                ocr_date_achat: '',
+                ocr_montant: '',
+                contient_menu_mxbo: false,
+                restaurant_id: '',
+            });
+            setImage(null);
+            setImagePreview(null);
+            setUploadedImageUrl(null);
+            setShowRestaurantSelect(false);
+            setAutoDetectedRestaurant(null);
+            setOcrCompleted(false);
 
         } catch (error) {
+            console.error('Erreur:', error);
             toast({
                 title: 'Erreur',
-                description: error instanceof Error ? error.message : 'Erreur inconnue',
-                variant: 'destructive',
-            })
+                description: error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'enregistrement',
+                variant: 'destructive'
+            });
         } finally {
-            setIsProcessing(false)
+            setIsProcessing(false);
         }
-    }
+    };
 
     return (
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl mx-auto p-6 bg-white shadow rounded-lg mt-10">
-            <h2 className="text-xl font-semibold text-center">Je tente ma chance</h2>
-            <p className="text-center">Je joins une photo de mon ticket :</p>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl mx-auto p-6 rounded-lg mt-10">
+            <h2 className="text-xl font-semibold text-center text-white">Je tente ma chance</h2>
+            <p className="text-center text-white">Je joins une photo de mon ticket :</p>
+
             {/* Photo du ticket */}
             <div className="space-y-2">
                 <div className="w-full flex justify-center">
@@ -255,22 +449,28 @@ export function ParticipationForm() {
 
                     <label
                         htmlFor="ticket-upload"
-                        className="cursor-pointer px-4 py-2 bg-white shadow text-black font-bold rounded-full inline-block"
+                        className="cursor-pointer px-4 py-2 bg-white shadow text-orange-600 font-bold rounded-full inline-block"
                     >
-                        SÉLECTIONNER UNE PHOTO
+                        PRENDRE UNE PHOTO
                     </label>
                 </div>
+
+                {/* Barre de progression */}
                 {isProcessing && (
                     <div className="mt-2">
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
                             <div
-                                className="bg-blue-600 h-2.5 rounded-full"
+                                className="bg-[#FFB700] h-2.5 rounded-full"
                                 style={{ width: `${uploadProgress}%` }}
                             />
                         </div>
-                        <p className="text-xs text-right mt-1">{uploadProgress}% complété</p>
+                        <p className="text-xs text-right mt-1">
+                            {uploadProgress}% complété
+                        </p>
                     </div>
                 )}
+
+                {/* Aperçu de l'image */}
                 {imagePreview && (
                     <div className="mt-4 border rounded-md overflow-hidden">
                         <img
@@ -282,43 +482,135 @@ export function ParticipationForm() {
                 )}
             </div>
 
-            {/* Champs extraits */}
-            <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                    <Label>Date d'achat *</Label>
-                    <Input type="date" {...form.register('ocr_date_achat')} />
-                </div>
-                <div className="space-y-2">
-                    <Label>Heure d'achat *</Label>
-                    <Input type="time" {...form.register('ocr_heure_achat')} />
-                </div>
-                <div className="space-y-2">
-                    <Label>Montant (€) *</Label>
-                    <Input type="number" step="0.01" {...form.register('ocr_montant')} />
-                </div>
-            </div>
+            {/* Champs du formulaire */}
+            {ocrCompleted && (
+                <div className="grid gap-4 md:grid-cols-2">
+                    {autoDetectedRestaurant && (
+                        <div className="space-y-2">
+                            <Label className="text-white" htmlFor="restaurant-name">Nom du restaurant *</Label>
+                            <Input
+                                id="restaurant-name"
+                                {...form.register('ocr_restaurant')}
+                                placeholder="Nom sur le ticket"
+                                disabled
+                            />
+                        </div>
+                    )}
 
-            {/* Résultat booléen */}
-            <div className="space-y-2">
-                <Label>MXBO ou Best Of</Label>
-                <Input
-                    type="text"
-                    value={form.watch('contient_menu_mxbo') ? 'Oui' : 'Non'}
-                    disabled
-                />
-            </div>
+                    <div className="space-y-2">
+                        <Label className="text-white" htmlFor="purchase-date">Date d'achat *</Label>
+                        <Input
+                            id="purchase-date"
+                            type="date"
+                            {...form.register('ocr_date_achat')}
+                            disabled={!!autoDetectedRestaurant}
+                            style={{
+                                WebkitAppearance: 'none',
+                                appearance: 'none'
+                            }}
+                        />
 
-            {/* Soumission */}
-            <Button type="submit" className="w-full" disabled={isProcessing || !image}>
-                {isProcessing ? (
-                    <span className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Enregistrement...
-                    </span>
-                ) : (
-                    'Tenter ma Chance'
-                )}
-            </Button>
+                        {form.formState.errors.ocr_date_achat && (
+                            <p className="text-sm text-red-500">
+                                {form.formState.errors.ocr_date_achat.message}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-white" htmlFor="amount">Montant (€) *</Label>
+                        <Input
+                            id="amount"
+                            type="number"
+                            step="0.01"
+                            {...form.register('ocr_montant')}
+                            placeholder="0.00"
+                            disabled={!!autoDetectedRestaurant}
+                        />
+                        {form.formState.errors.ocr_montant && (
+                            <p className="text-sm text-red-500">
+                                {form.formState.errors.ocr_montant.message}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Sélection du restaurant (si non reconnu) */}
+            {
+                ocrCompleted && showRestaurantSelect && (
+                    <div className="space-y-2">
+                        <Label className="text-white">Correspondance restaurant</Label>
+                        <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={open}
+                                    className="w-full justify-between"
+                                    type="button"
+                                >
+                                    {form.watch('restaurant_id')
+                                        ? restaurants.find((r) => r.id === form.watch('restaurant_id'))?.nom
+                                        : "Sélectionner un restaurant..."}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0" align="start">
+                                <Command>
+                                    <CommandInput
+                                        placeholder="Rechercher..."
+                                        value={searchTerm}
+                                        onValueChange={setSearchTerm}
+                                    />
+                                    <CommandEmpty>Aucun résultat</CommandEmpty>
+                                    <CommandGroup className="max-h-60 overflow-y-auto">
+                                        {filteredRestaurants.map((r) => (
+                                            <CommandItem
+                                                key={r.id}
+                                                value={r.nom}
+                                                onSelect={() => {
+                                                    form.setValue('restaurant_id', r.id)
+                                                    setOpen(false)
+                                                }}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        form.watch('restaurant_id') === r.id ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
+                                                {r.nom}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                        <p className="text-sm text-muted-foreground">
+                            Si le restaurant n'apparaît pas, vérifiez le nom saisi ci-dessus
+                        </p>
+                    </div>
+                )
+            }
+
+            {/* Bouton de soumission */}
+            {ocrCompleted && (
+                <Button
+                    type="submit"
+                    className="w-full bg-[#F56B29] text-white rounded-[60px] font-semibold transition hover:bg-[#e44f0d] disabled:opacity-60"
+                    disabled={isProcessing || !image}
+                >
+                    {isProcessing ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Enregistrement...
+                        </span>
+                    ) : (
+                        'Valider la participation'
+                    )}
+                </Button>
+            )}
         </form>
     )
 }

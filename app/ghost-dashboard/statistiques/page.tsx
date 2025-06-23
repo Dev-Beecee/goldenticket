@@ -1,45 +1,38 @@
-"use client";
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase-client";
-import DashboardLayout from "@/components/layouts/DashboardLayout"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { Database } from "@/types/database"
+import DashboardLayout from '@/components/layouts/DashboardLayout'
+import StatisticsDashboard from "@/components/statistique/StatisticsDashboard"
+import { checkPermission } from "@/lib/server/permit-wrapper"
 
-import StatisticsDashboard from "@/components/statistique/StatisticsDashboard";
+export default async function StatistiquesPage() {
+    const supabase = createServerComponentClient<Database>({
+        cookies: () => cookies()
+    })
 
-export default function StatistiquesPage() {
-    const router = useRouter();
-    const [collapsed, setCollapsed] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const {
+        data: { user },
+        error
+    } = await supabase.auth.getUser()
 
-    useEffect(() => {
-        const checkUser = async () => {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
-
-            if (!user || !user.email?.endsWith("@beecee.fr")) {
-                router.push("/login");
-                return;
-            }
-
-            setLoading(false);
-        };
-
-        checkUser();
-    }, [router]);
-
-    if (loading) {
-        return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
+    if (error || !user) {
+        redirect("/unauthorized")
     }
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        router.push("/login");
-    };
+
+    const hasPermission = await checkPermission(user.id, "read", "statistique")
+
+    if (!hasPermission) {
+        redirect("/unauthorized")
+    }
+
     return (
         <DashboardLayout>
-            <h1 className="text-2xl font-bold mb-6">Statistiques</h1>
+            <h1 className="text-2xl font-bold text-black mb-6">Statistiques</h1>
             <StatisticsDashboard />
-        </DashboardLayout>
-    );
+        </DashboardLayout >
+    )
 }

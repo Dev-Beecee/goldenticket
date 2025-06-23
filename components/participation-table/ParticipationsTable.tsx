@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-
+import { format, parseISO } from "date-fns";
 // Types
 type Participation = {
     id: string;
@@ -104,7 +104,7 @@ export default function ParticipationsTable({
                                     <td className="px-6 py-4 text-sm text-gray-500">{participation.inscription.prenom}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500">{participation.inscription.email}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500">
-                                        {new Date(participation.ocr_date_achat).toLocaleDateString()}
+                                        {format(parseISO(participation.ocr_date_achat), "dd/MM/yyyy")}
                                     </td>
                                     <td className="px-6 py-4 text-sm text-gray-500">
                                         {participation.ocr_montant} €
