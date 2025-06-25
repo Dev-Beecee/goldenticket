@@ -10,3 +10,13 @@ import ShareButton from "@/components/ShareButton";
 >
   Partager sur WhatsApp
 </ShareButton>
+
+Répartion des lots
+
+Récapitulatif des règles à appliquer
+On répartit tous les lots, même si la somme dépasse la capacité totale (1200 × nb de jours), mais on essaye de ne jamais dépasser 1200 lots par jour.
+On respecte strictement la priorité (les lots de priorité 1 sont répartis avant ceux de priorité 2, etc.).
+Si un lot a une date_distribution et une heure_distribution, il est attribué uniquement ce jour-là, à cette heure, et ne rentre pas dans la répartition quotidienne classique.
+On ne traite que les lots dont la quantité est strictement positive (mais tu m’as dit qu’ils ne seront jamais à 0).
+Plan de modification du code
+Récupérer tous les lots, triés par priorité croissante.

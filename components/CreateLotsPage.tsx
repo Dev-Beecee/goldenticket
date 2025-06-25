@@ -22,6 +22,11 @@ type Lot = {
     photo_url: string
     type_lot_id: string
     instructions?: string
+    quantite_disponible: number
+    priorite: number
+    date_distribution?: string
+    heure_distribution?: string
+    recuperation?: string
 }
 
 type TypeLot = {
@@ -100,6 +105,14 @@ export default function CreateLotsPage() {
         return typeLot ? typeLot.nom : 'Type inconnu'
     }
 
+    // Ajout d'une fonction utilitaire pour formater la date au format français
+    function formatDateFr(dateStr?: string) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toLocaleDateString('fr-FR');
+    }
+
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center">Chargement...</div>
     }
@@ -107,7 +120,7 @@ export default function CreateLotsPage() {
     return (
         <>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-black">Créer des lots</h1>
+                
                 <AjouterLotDialog typesLot={typesLot} onLotAdded={fetchLots} />
             </div>
 
@@ -135,6 +148,17 @@ export default function CreateLotsPage() {
                             <h3 className="text-lg font-semibold">{lot.titre}</h3>
                             <p className="text-sm text-gray-500">{lot.type_valeur}</p>
                             <p className="text-sm text-gray-500">Type: {getTypeLotNom(lot.type_lot_id)}</p>
+                            <p className="text-sm text-gray-500">Quantité disponible : {lot.quantite_disponible}</p>
+                            <p className="text-sm text-gray-500">Priorité : {lot.priorite}</p>
+                            {lot.date_distribution && (
+                                <p className="text-sm text-gray-500">Date de distribution : {formatDateFr(lot.date_distribution)}</p>
+                            )}
+                            {lot.heure_distribution && (
+                                <p className="text-sm text-gray-500">Heure de distribution : {lot.heure_distribution}</p>
+                            )}
+                            {lot.recuperation && (
+                                <p className="text-sm text-gray-500">Récupération : {lot.recuperation}</p>
+                            )}
 
                             {lot.instructions && (
                                 <Dialog>

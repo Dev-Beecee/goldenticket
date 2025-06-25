@@ -53,6 +53,10 @@ const data = {
           url: "/ghost-dashboard/repartlots",
         },
         {
+          title: "Restaurants",
+          url: "/ghost-dashboard/restaurants",
+        },
+        {
           title: "Création utilisateur",
           url: "/ghost-dashboard/creer-utilisateur",
         },

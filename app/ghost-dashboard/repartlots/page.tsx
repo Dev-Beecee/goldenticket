@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase-client'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
-import RepartitionLauncher from '@/components/RepartitionLauncher'
 import TableauRepartition from '@/components/TableauRepartition'
 
 export default function RepartLotsPage() {
@@ -62,7 +61,7 @@ export default function RepartLotsPage() {
             </div>
 
            
-            <RepartitionLauncher periode_id={periodeId} />
+            
             <TableauRepartition periode_id={periodeId} />
         </DashboardLayout>
     )
