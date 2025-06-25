@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import './GamePage.css'
 
 export default function GamePage() {
     const searchParams = useSearchParams()
+    const router = useRouter()
     const containerRef = useRef<HTMLDivElement | null>(null)
 
     const [inscriptionId, setInscriptionId] = useState<string | null>(null)
@@ -74,19 +75,25 @@ export default function GamePage() {
 
                 const result = await res.json();
 
+                // Gestion des cas spéciaux
+                if (result.result === 'Déjà joué' && result.gain === true) {
+                    router.push('/deja-gagne')
+                    return;
+                } else if (result.result === 'Déjà joué' && result.gain === false) {
+                    router.push('/tricheur')
+                    return;
+                }
+
                 if (result.gain) {
                     setImageResult(result.lot.image || '/images/gagne.jpeg');
                     setLotInstructions(result.lot.instructions || '');
-
-
-                    // ✅ L’envoi de l’email est maintenant géré côté serveur.
                 } else {
                     setImageResult(result.image || '/images/perdu.jpeg');
                 }
 
                 setLotLoaded(true);
             } catch (e) {
-                console.error('❌ Erreur lors de l’appel attribuer-lot:', e);
+                console.error("❌ Erreur lors de l'appel attribuer-lot:", e);
                 setImageResult('/images/perdu.jpeg');
                 setLotLoaded(true);
             }
@@ -121,9 +128,9 @@ export default function GamePage() {
                     percentToFinish: 50,
                     callback: () => {
                         if (lotInstructions !== null && inscriptionId) {
-                            alert(`Félicitations ! Tu as gagné !\n\nInstructions : ${lotInstructions}`)
+                            router.push('/gagner')
                         } else {
-                            alert('Dommage, réessaye demain !')
+                            router.push('/perdu')
                         }
                     }
                 })
@@ -175,7 +182,7 @@ export default function GamePage() {
                             <p className="text-sm text-gray-600">Chargement du jeu...</p>
                         </div>
                     )}
-                    <div className="sc__infos mt-4 text-center">Progression : 0%</div>
+                    <div className="sc__infos mt-4 text-center" style={{ display: 'none' }}>Progression : 0%</div>
                 </div>
             )}
         </main>

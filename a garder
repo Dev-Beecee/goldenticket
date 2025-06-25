@@ -1,0 +1,12 @@
+btn partage front  : 
+
+import ShareButton from "@/components/ShareButton";
+
+<ShareButton
+  inscriptionId="ID_UTILISATEUR"
+  canal="whatsapp"
+  shareUrl="https://tonsite.com/jeu?ref=ID_UTILISATEUR"
+  meta={{ description: "Viens jouer avec moi !" }}
+>
+  Partager sur WhatsApp
+</ShareButton>

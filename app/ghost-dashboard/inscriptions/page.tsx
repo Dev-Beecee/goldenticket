@@ -24,12 +24,26 @@ export default async function InscriptionsPage() {
 
     const { data: inscriptionsData, error: inscriptionError } = await supabase
         .from('inscription')
-        .select('*')
+        .select('*, participations:participation(id)')
         .order('created_at', { ascending: false })
+
+    const { data: partagesData } = await supabase
+        .rpc('count_partages_by_inscription')
+
+    const partageMap = new Map<string, number>();
+    (partagesData || []).forEach((row: any) => {
+        partageMap.set(row.inscription_id, row.count);
+    });
+
+    const inscriptionsWithCount = (inscriptionsData || []).map((insc: any) => ({
+        ...insc,
+        participationsCount: insc.participations ? insc.participations.length : 0,
+        partagesCount: partageMap.get(insc.id) || 0,
+    }))
 
     return (
         <DashboardLayout>
-            <InscriptionsPageClient inscriptions={inscriptionsData || []} />
+            <InscriptionsPageClient inscriptions={inscriptionsWithCount} />
         </DashboardLayout>
     )
 }

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -26,6 +26,11 @@ const formSchema = z.object({
     message: "Vous devez accepter le règlement pour participer.",
   }),
   accepte_marketing: z.boolean().default(false),
+  utm_source: z.string().optional(),
+  utm_medium: z.string().optional(),
+  utm_campaign: z.string().optional(),
+  utm_term: z.string().optional(),
+  utm_content: z.string().optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -36,6 +41,7 @@ export function RegistrationForm() {
   const [registrationId, setRegistrationId] = useState<string | null>(null)
   const [hasParticipated, setHasParticipated] = useState<boolean>(false)
   const router = useRouter() // Déjà importé
+  const searchParams = useSearchParams();
 
   const { toast } = useToast()
 
@@ -49,6 +55,11 @@ export function RegistrationForm() {
       telephone: '',
       accepte_reglement: false,
       accepte_marketing: false,
+      utm_source: '',
+      utm_medium: '',
+      utm_campaign: '',
+      utm_term: '',
+      utm_content: '',
     },
   })
 
@@ -86,7 +97,14 @@ export function RegistrationForm() {
         form.reset(parsed)
       } catch { }
     }
-  }, [form])
+
+    // Récupération automatique des UTM depuis l'URL
+    const utmFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+    utmFields.forEach(field => {
+      const value = searchParams.get(field) || '';
+      form.setValue(field as keyof FormValues, value);
+    });
+  }, [form, searchParams])
 
   // Dans la fonction onSubmit du composant RegistrationForm
   async function onSubmit(data: FormValues) {

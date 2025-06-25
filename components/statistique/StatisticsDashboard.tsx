@@ -19,6 +19,15 @@ type StatsType = {
     moyenneParJour: number;
     moyenneParJoueur: number;
     participationsParJour: Record<string, number>;
+    utm?: {
+        source: Record<string, number>;
+        medium: Record<string, number>;
+        campaign: Record<string, number>;
+        term: Record<string, number>;
+        content: Record<string, number>;
+    };
+    partagesParCanal?: Record<string, number>;
+    tauxParticipationParJour?: Record<string, number>;
 };
 
 export default function StatisticsDashboard() {
@@ -74,10 +83,7 @@ export default function StatisticsDashboard() {
         doc.setFontSize(12);
         for (const [restaurant, count] of Object.entries(stats.participationsParRestaurant)) {
             doc.text(`- ${restaurant} : ${count}`, 10, y += 6);
-            if (y > 280) {
-                doc.addPage();
-                y = 10;
-            }
+            if (y > 280) { doc.addPage(); y = 10; }
         }
 
         y += 10;
@@ -86,10 +92,7 @@ export default function StatisticsDashboard() {
         doc.setFontSize(12);
         for (const [date, count] of Object.entries(stats.participationsParJour)) {
             doc.text(`${format(new Date(date), 'd MMM yyyy', { locale: fr })} : ${count} participations`, 10, y += 6);
-            if (y > 280) {
-                doc.addPage();
-                y = 10;
-            }
+            if (y > 280) { doc.addPage(); y = 10; }
         }
 
         y += 10;
@@ -98,6 +101,47 @@ export default function StatisticsDashboard() {
         doc.setFontSize(12);
         for (const [tranche, count] of Object.entries(stats.participationsParTranche)) {
             doc.text(`${tranche} € : ${count} participations`, 10, y += 6);
+        }
+
+        // UTM
+        if (stats.utm) {
+            y += 10;
+            doc.setFontSize(14);
+            doc.text("Statistiques UTM :", 10, y += 10);
+            doc.setFontSize(12);
+            for (const [utmType, utmObj] of Object.entries(stats.utm)) {
+                doc.text(`${utmType} :`, 10, y += 8);
+                for (const [val, count] of Object.entries(utmObj as Record<string, number>)) {
+                    doc.text(`- ${val} : ${count}`, 16, y += 6);
+                    if (y > 280) { doc.addPage(); y = 10; }
+                }
+            }
+        }
+
+        // Partages par canal
+        if (stats.partagesParCanal) {
+            y += 10;
+            doc.setFontSize(14);
+            doc.text("Partages par canal :", 10, y += 10);
+            doc.setFontSize(12);
+            for (const [canal, count] of Object.entries(stats.partagesParCanal)) {
+                doc.text(`- ${canal} : ${count}`, 10, y += 6);
+                if (y > 280) { doc.addPage(); y = 10; }
+            }
+        }
+
+        // Taux de participation par jour
+        if (stats.tauxParticipationParJour) {
+            y += 10;
+            doc.setFontSize(14);
+            doc.text("Taux de participation par jour :", 10, y += 10);
+            doc.setFontSize(12);
+            for (const [date, taux] of Object.entries(stats.tauxParticipationParJour)) {
+                const parsedDate = new Date(date);
+                const isValid = !isNaN(parsedDate.getTime());
+                doc.text(`${isValid ? format(parsedDate, 'd MMM yyyy', { locale: fr }) : date} : ${taux}`, 10, y += 6);
+                if (y > 280) { doc.addPage(); y = 10; }
+            }
         }
 
         doc.save("statistiques.pdf");
@@ -159,6 +203,55 @@ export default function StatisticsDashboard() {
                             ))}
                         </ul>
                     </div>
+
+                    {/* UTM */}
+                    {stats.utm && (
+                        <div className="bg-white rounded-lg shadow-md p-6 space-y-2 col-span-full">
+                            <h3 className="text-lg font-semibold text-gray-700 mb-2">Statistiques UTM</h3>
+                            {Object.entries(stats.utm).map(([utmType, utmObj]) => (
+                                <div key={utmType}>
+                                    <strong className="capitalize">{utmType} :</strong>
+                                    <ul className="ml-4">
+                                        {Object.entries(utmObj as Record<string, number>).map(([val, count]) => (
+                                            <li className="text-black" key={val}>{val} : {count}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Partages par canal */}
+                    {stats.partagesParCanal && (
+                        <div className="bg-white rounded-lg shadow-md p-6 space-y-2 col-span-full">
+                            <h3 className="text-lg font-semibold text-gray-700 mb-2">Partages par canal</h3>
+                            <ul className="space-y-1 text-sm">
+                                {Object.entries(stats.partagesParCanal).map(([canal, count]) => (
+                                    <li className="text-black" key={canal}>{canal} : {count}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* Taux de participation par jour */}
+                    {stats.tauxParticipationParJour && (
+                        <div className="bg-white rounded-lg shadow-md p-6 space-y-2 col-span-full">
+                            <h3 className="text-lg font-semibold text-gray-700 mb-2">Taux de participation par jour</h3>
+                            <ul className="space-y-1 text-sm">
+                                {Object.entries(stats.tauxParticipationParJour).map(([date, taux]) => {
+                                    const parsedDate = new Date(date);
+                                    const isValid = !isNaN(parsedDate.getTime());
+                                    return (
+                                        <li className="text-black" key={date}>
+                                            {isValid
+                                                ? format(parsedDate, 'd MMM yyyy', { locale: fr })
+                                                : date} : {taux}
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

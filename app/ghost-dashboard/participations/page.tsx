@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Database } from "@/types/database"
 import DashboardLayout from "@/components/layouts/DashboardLayout";
+import ParticipationPerDayChart from "@/components/statistique/ParticipationPerDayChart";
 
 import ParticipationsTableWrapper from "@/components/ParticipationsTableWrapper"
 import SearchBar from "@/components/SearchBar"
@@ -76,7 +77,7 @@ export default async function ParticipationsPage({
             <h1 className="text-2xl font-bold mb-4 text-black">Liste des Participations</h1>
 
             <SearchBar placeholder="Rechercher par nom, prénom ou email..." />
-
+            <ParticipationPerDayChart />
             <QuickValidationCarouselWrapper participations={filteredParticipations} />
 
             <div className="mt-10">

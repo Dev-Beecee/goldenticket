@@ -9,6 +9,8 @@ type Inscription = {
     email: string;
     telephone: string;
     created_at: string;
+    participationsCount: number;
+    partagesCount?: number;
 };
 
 type InscriptionsTableProps = {
@@ -21,6 +23,9 @@ export default function InscriptionsTable({ inscriptions }: InscriptionsTablePro
 
     const totalPages = Math.ceil(inscriptions.length / itemsPerPage);
 
+    // Calcul du total des participations (tous utilisateurs)
+    const totalParticipations = inscriptions.reduce((acc, insc) => acc + (insc.participationsCount || 0), 0);
+
     const handleNext = () => {
         if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
     };
@@ -30,13 +35,15 @@ export default function InscriptionsTable({ inscriptions }: InscriptionsTablePro
     };
 
     const exportToCSV = () => {
-        const headers = ["Nom", "Prénom", "Email", "Téléphone", "Date d'inscription"];
+        const headers = ["Nom", "Prénom", "Email", "Téléphone", "Date d'inscription", "Participations", "Partages"];
         const csvRows = inscriptions.map((inscription) => [
             `"${inscription.nom}"`,
             `"${inscription.prenom}"`,
             `"${inscription.email}"`,
             `"${inscription.telephone}"`,
             `"${new Date(inscription.created_at).toLocaleDateString()}"`,
+            `"${inscription.participationsCount}"`,
+            `"${inscription.partagesCount ?? 0}"`,
         ].join(','));
 
         const csv = [headers.join(','), ...csvRows].join('\n');
@@ -74,6 +81,9 @@ export default function InscriptionsTable({ inscriptions }: InscriptionsTablePro
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Participations</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Partages</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% Participation</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -85,6 +95,17 @@ export default function InscriptionsTable({ inscriptions }: InscriptionsTablePro
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inscription.telephone}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {new Date(inscription.created_at).toLocaleDateString()}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                        {inscription.participationsCount}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                        {inscription.partagesCount ?? 0}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                        {totalParticipations > 0
+                                            ? ((inscription.participationsCount / totalParticipations) * 100).toFixed(1) + ' %'
+                                            : '0 %'}
                                     </td>
                                 </tr>
                             ))}

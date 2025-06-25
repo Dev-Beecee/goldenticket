@@ -192,7 +192,7 @@ export function ParticipationForm() {
             });
 
             if (!signedUrlRes.ok) {
-                throw new Error('Impossible de récupérer l’URL pré-signée');
+                throw new Error("Impossible de récupérer l'URL pré-signée");
             }
 
             const { uploadUrl, fileUrl } = await signedUrlRes.json();
@@ -205,12 +205,12 @@ export function ParticipationForm() {
             });
 
             if (!uploadRes.ok) {
-                throw new Error('Échec de l’upload vers S3');
+                throw new Error("Échec de l'upload vers S3");
             }
 
             setUploadedImageUrl(fileUrl);
 
-            // 🧠 Étape 3 : Appel OCR avec l’URL publique
+            // 🧠 Étape 3 : Appel OCR avec l'URL publique
             await autoFillWithOCR(fileUrl);
 
             toast({
@@ -222,7 +222,7 @@ export function ParticipationForm() {
             console.error('Erreur upload/image:', error);
             toast({
                 title: 'Erreur',
-                description: error instanceof Error ? error.message : 'Erreur lors de l’upload',
+                description: error instanceof Error ? error.message : "Erreur lors de l'upload",
                 variant: 'destructive',
             });
         } finally {
@@ -253,7 +253,7 @@ export function ParticipationForm() {
 
         if (!urlToUse) {
             console.error('Erreur critique: uploadedImageUrl non défini');
-            throw new Error('URL de l\'image manquante pour l\'analyse OCR');
+            throw new Error("URL de l'image manquante pour l'analyse OCR");
         }
 
         try {

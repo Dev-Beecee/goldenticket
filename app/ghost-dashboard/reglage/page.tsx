@@ -6,9 +6,8 @@ import { redirect } from "next/navigation"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Database } from "@/types/database"
 import { checkPermission } from "@/lib/server/permit-wrapper"
-
 import DashboardLayout from "@/components/layouts/DashboardLayout"
-import PeriodeJeuForm from "@/components/PeriodeJeuForm"
+import ReglageClient from "@/components/ReglageClient"
 
 export default async function ReglagePage() {
     const cookieStore = cookies()
@@ -32,8 +31,7 @@ export default async function ReglagePage() {
     return (
         <DashboardLayout>
             <h1 className="text-2xl font-bold mb-4 text-black">Réglages du jeu</h1>
-            <PeriodeJeuForm />
-        </DashboardLayout >
-
+            <ReglageClient userId="00000000-0000-0000-0000-000000000001" baseShareUrl="https://tonsite.com/jeu" />
+        </DashboardLayout>
     )
 }

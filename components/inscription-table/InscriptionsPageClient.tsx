@@ -12,6 +12,7 @@ type Inscription = {
     accepte_reglement: boolean
     accepte_marketing: boolean
     created_at: string
+    participationsCount: number
 }
 
 export default function InscriptionsPageClient({ inscriptions }: { inscriptions: Inscription[] }) {
