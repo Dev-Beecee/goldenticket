@@ -215,7 +215,7 @@ export function ParticipationForm() {
             setUploadProgress(20);
             const headers = {
                 'Content-Type': compressedFile.type,
-                'Content-Length': compressedFile.size.toString(),
+                
             };
             await uploadWithRetry(uploadUrl, compressedFile, (progress) => {
                 setUploadProgress(20 + (progress * 0.6)); // 20% à 80%
