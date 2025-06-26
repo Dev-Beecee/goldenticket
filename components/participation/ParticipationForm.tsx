@@ -172,8 +172,8 @@ export function ParticipationForm() {
             console.log('🚀 Début traitement image');
             // 🖼️ Compression avec browser-image-compression
             const compressedFile = await imageCompression(file, {
-                maxWidthOrHeight: 1200,
-                maxSizeMB: 1.5,
+                maxWidthOrHeight: 1000,
+                maxSizeMB: 1,
                 useWebWorker: true,
                 initialQuality: 0.8,
             });
