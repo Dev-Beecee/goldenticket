@@ -682,7 +682,12 @@ export function ParticipationForm() {
 
             // ✅ Redirection ou message selon contient_menu_mxbo
             if (values.contient_menu_mxbo) {
-                router.push(`/game?id=${result.participation_id}`);
+                // Nouvelle logique : si déjà gagné, redirige vers deja-gagne
+                if (result.result === 'Déjà joué' && result.gain === true && result.participation_id) {
+                    router.push(`/deja-gagne?id=${result.participation_id}`)
+                } else {
+                    router.push(`/game?id=${result.participation_id}`);
+                }
             } else {
                 toast({
                     title: 'Désolé',
