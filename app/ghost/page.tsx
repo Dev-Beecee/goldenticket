@@ -125,8 +125,8 @@ export default function Login() {
                             type="submit"
                             disabled={isSubmitting || isCheckingPermission}
                             className={`w-full flex justify-center py-2 px-4 rounded-md text-white font-medium ${(isSubmitting || isCheckingPermission)
-                                ? "bg-indigo-400 cursor-not-allowed"
-                                : "bg-indigo-600 hover:bg-indigo-700"
+                                ? "bg-gray-700 cursor-not-allowed"
+                                : "bg-black hover:bg-gray-900"
                                 }`}
                         >
                             {(isSubmitting || isCheckingPermission) ? (
