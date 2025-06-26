@@ -201,9 +201,9 @@ export function ParticipationForm() {
 
             const { uploadUrl, fileUrl } = await signedUrlRes.json();
 
-            // 🔼 Étape 2 : Upload direct vers S3 avec progression réelle
+            // 🔼 Étape 2 : Upload direct vers S3 avec retry
             setUploadProgress(20);
-            await uploadWithProgress(uploadUrl, compressedFile, (progress) => {
+            await uploadWithRetry(uploadUrl, compressedFile, (progress) => {
                 setUploadProgress(20 + (progress * 0.6)); // 20% à 80%
             });
 
@@ -221,9 +221,18 @@ export function ParticipationForm() {
             });
         } catch (error) {
             console.error('Erreur upload/image:', error);
+            
+            // 🔧 Message d'erreur plus spécifique pour iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            let errorMessage = error instanceof Error ? error.message : "Erreur lors de l'upload";
+            
+            if (isIOS && errorMessage.includes('failed')) {
+                errorMessage = "Problème de connexion sur iPhone. Vérifiez votre connexion et réessayez.";
+            }
+            
             toast({
                 title: 'Erreur',
-                description: error instanceof Error ? error.message : "Erreur lors de l'upload",
+                description: errorMessage,
                 variant: 'destructive',
             });
         } finally {
@@ -336,26 +345,6 @@ export function ParticipationForm() {
         ctx.restore();
     };
 
-    // 📤 Fonction d'upload avec fallback pour iOS
-    const uploadWithProgress = async (
-        url: string, 
-        file: File, 
-        onProgress: (progress: number) => void
-    ): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            // 🔧 Détecter iOS
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            
-            if (isIOS) {
-                // 🍎 Utiliser fetch avec fallback pour iOS
-                uploadWithFetch(url, file, onProgress).then(resolve).catch(reject);
-            } else {
-                // 📱 Utiliser XMLHttpRequest pour les autres
-                uploadWithXHR(url, file, onProgress).then(resolve).catch(reject);
-            }
-        });
-    };
-
     // 📤 Upload avec fetch (plus fiable sur iOS)
     const uploadWithFetch = async (
         url: string, 
@@ -363,19 +352,34 @@ export function ParticipationForm() {
         onProgress: (progress: number) => void
     ): Promise<void> => {
         try {
+            // 🔧 Ajouter des headers supplémentaires pour iOS
+            const headers: Record<string, string> = {
+                'Content-Type': file.type,
+            };
+
+            // 🍎 Headers spécifiques pour iOS
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                headers['Cache-Control'] = 'no-cache';
+                headers['Pragma'] = 'no-cache';
+            }
+
             const response = await fetch(url, {
                 method: 'PUT',
-                headers: { 'Content-Type': file.type },
+                headers,
                 body: file,
+                // 🔧 Timeout plus long pour iOS
+                signal: AbortSignal.timeout(60000), // 60 secondes
             });
             
             if (!response.ok) {
-                throw new Error(`Upload failed: ${response.status}`);
+                console.error('Upload response:', response.status, response.statusText);
+                throw new Error(`Upload failed: ${response.status} - ${response.statusText}`);
             }
             
             // Simulation de progression pour iOS
             onProgress(100);
         } catch (error) {
+            console.error('Upload fetch error:', error);
             throw error;
         }
     };
@@ -389,6 +393,9 @@ export function ParticipationForm() {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             
+            // 🔧 Timeout plus long
+            xhr.timeout = 60000; // 60 secondes
+            
             xhr.upload.addEventListener('progress', (event) => {
                 if (event.lengthComputable) {
                     const progress = (event.loaded / event.total) * 100;
@@ -397,21 +404,67 @@ export function ParticipationForm() {
             });
             
             xhr.addEventListener('load', () => {
+                console.log('XHR response:', xhr.status, xhr.statusText);
                 if (xhr.status >= 200 && xhr.status < 300) {
                     resolve();
                 } else {
-                    reject(new Error(`Upload failed: ${xhr.status}`));
+                    reject(new Error(`Upload failed: ${xhr.status} - ${xhr.statusText}`));
                 }
             });
             
-            xhr.addEventListener('error', () => {
-                reject(new Error('Upload failed'));
+            xhr.addEventListener('error', (event) => {
+                console.error('XHR error:', event);
+                reject(new Error('Upload failed - Network error'));
+            });
+            
+            xhr.addEventListener('timeout', () => {
+                console.error('XHR timeout');
+                reject(new Error('Upload failed - Timeout'));
             });
             
             xhr.open('PUT', url);
             xhr.setRequestHeader('Content-Type', file.type);
+            
+            // 🔧 Headers supplémentaires pour éviter les problèmes CORS
+            xhr.setRequestHeader('Cache-Control', 'no-cache');
+            xhr.setRequestHeader('Pragma', 'no-cache');
+            
             xhr.send(file);
         });
+    };
+
+    // 🔧 Fonction d'upload avec retry pour iOS
+    const uploadWithRetry = async (
+        url: string, 
+        file: File, 
+        onProgress: (progress: number) => void,
+        maxRetries: number = 3
+    ): Promise<void> => {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                console.log(`Tentative d'upload ${attempt}/${maxRetries}`);
+                
+                if (isIOS) {
+                    await uploadWithFetch(url, file, onProgress);
+                } else {
+                    await uploadWithXHR(url, file, onProgress);
+                }
+                
+                console.log('Upload réussi');
+                return;
+            } catch (error) {
+                console.error(`Tentative ${attempt} échouée:`, error);
+                
+                if (attempt === maxRetries) {
+                    throw error;
+                }
+                
+                // 🔧 Attendre avant de réessayer
+                await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            }
+        }
     };
 
     const findMatchingRestaurant = useCallback((restaurantName: string) => {
