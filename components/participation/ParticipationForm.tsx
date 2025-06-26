@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/popover'
 import { Check, ChevronsUpDown, Loader2, XCircle, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import imageCompression from 'browser-image-compression'
 
 const schema = z.object({
     ocr_restaurant: z.string().min(2, { message: 'Minimum 2 caractères requis' }),
@@ -169,11 +170,15 @@ export function ParticipationForm() {
 
         try {
             console.log('🚀 Début traitement image');
-            
-            // 🖼️ Étape 0 : Compression et redimensionnement de l'image
-            const compressedFile = await compressImage(file);
+            // 🖼️ Compression avec browser-image-compression
+            const compressedFile = await imageCompression(file, {
+                maxWidthOrHeight: 1200,
+                maxSizeMB: 1.5,
+                useWebWorker: true,
+                initialQuality: 0.8,
+            });
             console.log('📦 Image compressée:', compressedFile.size, 'bytes');
-            
+
             // Prévisualisation avec l'image compressée
             const preview = await new Promise<string>((resolve, reject) => {
                 const reader = new FileReader();
@@ -208,6 +213,10 @@ export function ParticipationForm() {
 
             // 🔼 Étape 2 : Upload direct vers S3 avec retry
             setUploadProgress(20);
+            const headers = {
+                'Content-Type': compressedFile.type,
+                'Content-Length': compressedFile.size.toString(),
+            };
             await uploadWithRetry(uploadUrl, compressedFile, (progress) => {
                 setUploadProgress(20 + (progress * 0.6)); // 20% à 80%
             });
@@ -226,10 +235,7 @@ export function ParticipationForm() {
             });
         } catch (error) {
             console.error('❌ Erreur upload/image:', error);
-            
-            // 🔧 Diagnostic précis de l'erreur
             let errorMessage = "Erreur lors de l'upload";
-            
             if (error instanceof Error) {
                 if (error.message.includes('timeout')) {
                     errorMessage = "Le serveur met trop de temps à répondre. Réessayez dans quelques instants.";
@@ -243,7 +249,6 @@ export function ParticipationForm() {
                     errorMessage = error.message;
                 }
             }
-            
             toast({
                 title: 'Erreur',
                 description: errorMessage,
@@ -366,43 +371,35 @@ export function ParticipationForm() {
         onProgress: (progress: number) => void
     ): Promise<void> => {
         try {
-            // 🔧 Ajouter des headers supplémentaires pour iOS
             const headers: Record<string, string> = {
                 'Content-Type': file.type,
             };
-
-            // 🍎 Headers spécifiques pour iOS
+            // Ajout du Content-Length si possible
+            if (typeof file.size === 'number') {
+                headers['Content-Length'] = file.size.toString();
+            }
             if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
                 headers['Cache-Control'] = 'no-cache';
                 headers['Pragma'] = 'no-cache';
             }
-
             console.log('🔄 Début upload fetch vers:', url);
             console.log('📁 Taille fichier:', file.size, 'bytes');
-
             const response = await fetch(url, {
                 method: 'PUT',
                 headers,
                 body: file,
-                // 🔧 Timeout plus long pour iOS
-                signal: AbortSignal.timeout(120000), // 2 minutes
+                signal: AbortSignal.timeout(120000),
             });
-            
             console.log('📡 Réponse upload:', response.status, response.statusText);
-            
             if (!response.ok) {
                 const errorText = await response.text().catch(() => 'Pas de détails');
                 console.error('❌ Upload failed:', response.status, errorText);
                 throw new Error(`Upload failed: ${response.status} - ${response.statusText}`);
             }
-            
-            // Simulation de progression pour iOS
             onProgress(100);
             console.log('✅ Upload fetch réussi');
         } catch (error) {
             console.error('❌ Upload fetch error:', error);
-            
-            // 🔧 Diagnostic plus précis de l'erreur
             if (error instanceof Error) {
                 if (error.name === 'AbortError') {
                     throw new Error('Upload timeout - Le serveur met trop de temps à répondre');
@@ -412,7 +409,6 @@ export function ParticipationForm() {
                     throw new Error('Erreur de configuration serveur - Contactez le support');
                 }
             }
-            
             throw error;
         }
     };
