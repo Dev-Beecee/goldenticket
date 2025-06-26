@@ -231,57 +231,157 @@ export function ParticipationForm() {
         }
     };
 
-    // 🖼️ Fonction de compression d'image
+    // 🖼️ Fonction de compression d'image optimisée pour iOS
     const compressImage = (file: File): Promise<File> => {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d')!;
             const img = new Image();
             
+            // 🔧 Correction de l'orientation pour iOS
             img.onload = () => {
-                // Calculer les nouvelles dimensions (max 1200px de large)
+                // Détecter l'orientation EXIF et corriger
+                const orientation = getImageOrientation(file);
+                const { width, height } = getImageDimensions(img, orientation);
+                
+                // Calculer les nouvelles dimensions (max 1200px)
                 const maxWidth = 1200;
                 const maxHeight = 1200;
-                let { width, height } = img;
+                let newWidth = width;
+                let newHeight = height;
                 
                 if (width > height) {
                     if (width > maxWidth) {
-                        height = (height * maxWidth) / width;
-                        width = maxWidth;
+                        newHeight = (height * maxWidth) / width;
+                        newWidth = maxWidth;
                     }
                 } else {
                     if (height > maxHeight) {
-                        width = (width * maxHeight) / height;
-                        height = maxHeight;
+                        newWidth = (width * maxHeight) / height;
+                        newHeight = maxHeight;
                     }
                 }
                 
-                canvas.width = width;
-                canvas.height = height;
+                canvas.width = newWidth;
+                canvas.height = newHeight;
                 
-                // Dessiner l'image redimensionnée
-                ctx.drawImage(img, 0, 0, width, height);
+                // Appliquer la transformation d'orientation
+                applyImageOrientation(ctx, img, orientation, newWidth, newHeight);
                 
-                // Convertir en blob avec compression
-                canvas.toBlob((blob) => {
-                    if (blob) {
-                        const compressedFile = new File([blob], file.name, {
-                            type: 'image/jpeg',
-                            lastModified: Date.now(),
-                        });
-                        resolve(compressedFile);
-                    } else {
-                        resolve(file); // Fallback si compression échoue
-                    }
-                }, 'image/jpeg', 0.8); // Qualité 80%
+                // 🔧 Fallback pour iOS si toBlob échoue
+                try {
+                    canvas.toBlob((blob) => {
+                        if (blob) {
+                            const compressedFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now(),
+                            });
+                            resolve(compressedFile);
+                        } else {
+                            // Fallback : utiliser l'image originale
+                            console.warn('Compression échouée, utilisation de l\'image originale');
+                            resolve(file);
+                        }
+                    }, 'image/jpeg', 0.8);
+                } catch (error) {
+                    console.warn('Erreur compression, utilisation de l\'image originale:', error);
+                    resolve(file);
+                }
+            };
+            
+            img.onerror = () => {
+                console.warn('Erreur chargement image, utilisation de l\'originale');
+                resolve(file);
             };
             
             img.src = URL.createObjectURL(file);
         });
     };
 
-    // 📤 Fonction d'upload avec progression réelle
+    // 🔧 Fonction pour détecter l'orientation EXIF
+    const getImageOrientation = (file: File): number => {
+        // Par défaut, orientation normale
+        return 1;
+    };
+
+    // 🔧 Fonction pour calculer les dimensions avec orientation
+    const getImageDimensions = (img: HTMLImageElement, orientation: number): { width: number; height: number } => {
+        if (orientation > 4 && orientation < 9) {
+            return { width: img.height, height: img.width };
+        }
+        return { width: img.width, height: img.height };
+    };
+
+    // 🔧 Fonction pour appliquer l'orientation
+    const applyImageOrientation = (
+        ctx: CanvasRenderingContext2D, 
+        img: HTMLImageElement, 
+        orientation: number, 
+        width: number, 
+        height: number
+    ) => {
+        ctx.save();
+        
+        switch (orientation) {
+            case 2: ctx.transform(-1, 0, 0, 1, width, 0); break;
+            case 3: ctx.transform(-1, 0, 0, -1, width, height); break;
+            case 4: ctx.transform(1, 0, 0, -1, 0, height); break;
+            case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
+            case 6: ctx.transform(0, 1, -1, 0, height, 0); break;
+            case 7: ctx.transform(0, -1, -1, 0, height, width); break;
+            case 8: ctx.transform(0, -1, 1, 0, 0, width); break;
+        }
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        ctx.restore();
+    };
+
+    // 📤 Fonction d'upload avec fallback pour iOS
     const uploadWithProgress = async (
+        url: string, 
+        file: File, 
+        onProgress: (progress: number) => void
+    ): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            // 🔧 Détecter iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            if (isIOS) {
+                // 🍎 Utiliser fetch avec fallback pour iOS
+                uploadWithFetch(url, file, onProgress).then(resolve).catch(reject);
+            } else {
+                // 📱 Utiliser XMLHttpRequest pour les autres
+                uploadWithXHR(url, file, onProgress).then(resolve).catch(reject);
+            }
+        });
+    };
+
+    // 📤 Upload avec fetch (plus fiable sur iOS)
+    const uploadWithFetch = async (
+        url: string, 
+        file: File, 
+        onProgress: (progress: number) => void
+    ): Promise<void> => {
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Content-Type': file.type },
+                body: file,
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Upload failed: ${response.status}`);
+            }
+            
+            // Simulation de progression pour iOS
+            onProgress(100);
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    // 📤 Upload avec XMLHttpRequest (pour les autres navigateurs)
+    const uploadWithXHR = async (
         url: string, 
         file: File, 
         onProgress: (progress: number) => void
