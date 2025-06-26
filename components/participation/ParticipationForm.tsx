@@ -360,6 +360,21 @@ export function ParticipationForm() {
             if (!checkRes.ok) {
                 const result = await checkRes.json();
                 console.log('📛 Réponse Edge Function:', result);
+                
+                // ✅ Enregistre la participation rejetée avec statut 'invalide'
+                const { error: insertError } = await supabase.from('participation').insert([
+                    {
+                        inscription_id: inscriptionId,
+                        image_url: uploadedImageUrl,
+                        ...values,
+                        statut_validation: 'invalide',
+                        created_at: new Date().toISOString(),
+                    },
+                ]);
+                if (insertError) {
+                    console.error('Erreur lors de l\'insertion participation invalide:', insertError);
+                }
+
                 toast({
                     title: 'Date invalide',
                     description: result?.error

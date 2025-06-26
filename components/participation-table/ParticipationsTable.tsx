@@ -119,6 +119,7 @@ export default function ParticipationsTable({
                                             <option value="validé">Validé</option>
                                             <option value="validéia">Validé IA</option>
                                             <option value="rejeté">Rejeté</option>
+                                            <option value="invalide">Invalide</option>
                                         </select>
                                     </td>
                                     <td className="px-6 py-4 text-sm text-gray-500">
