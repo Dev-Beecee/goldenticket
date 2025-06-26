@@ -168,8 +168,11 @@ export function ParticipationForm() {
         setOcrCompleted(false);
 
         try {
+            console.log('🚀 Début traitement image');
+            
             // 🖼️ Étape 0 : Compression et redimensionnement de l'image
             const compressedFile = await compressImage(file);
+            console.log('📦 Image compressée:', compressedFile.size, 'bytes');
             
             // Prévisualisation avec l'image compressée
             const preview = await new Promise<string>((resolve, reject) => {
@@ -186,6 +189,7 @@ export function ParticipationForm() {
 
             // 🔗 Étape 1 : Obtenir l'URL pré-signée
             setUploadProgress(10);
+            console.log('🔑 Récupération URL pré-signée...');
             const signedUrlRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/presigned-url', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -200,6 +204,7 @@ export function ParticipationForm() {
             }
 
             const { uploadUrl, fileUrl } = await signedUrlRes.json();
+            console.log('🔑 URL pré-signée obtenue');
 
             // 🔼 Étape 2 : Upload direct vers S3 avec retry
             setUploadProgress(20);
@@ -220,14 +225,23 @@ export function ParticipationForm() {
                 variant: 'default',
             });
         } catch (error) {
-            console.error('Erreur upload/image:', error);
+            console.error('❌ Erreur upload/image:', error);
             
-            // 🔧 Message d'erreur plus spécifique pour iOS
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            let errorMessage = error instanceof Error ? error.message : "Erreur lors de l'upload";
+            // 🔧 Diagnostic précis de l'erreur
+            let errorMessage = "Erreur lors de l'upload";
             
-            if (isIOS && errorMessage.includes('failed')) {
-                errorMessage = "Problème de connexion sur iPhone. Vérifiez votre connexion et réessayez.";
+            if (error instanceof Error) {
+                if (error.message.includes('timeout')) {
+                    errorMessage = "Le serveur met trop de temps à répondre. Réessayez dans quelques instants.";
+                } else if (error.message.includes('Erreur réseau')) {
+                    errorMessage = "Problème de connexion. Vérifiez votre réseau et réessayez.";
+                } else if (error.message.includes('CORS')) {
+                    errorMessage = "Erreur technique. Contactez le support.";
+                } else if (error.message.includes('Upload failed')) {
+                    errorMessage = "Échec de l'upload. Réessayez ou contactez le support.";
+                } else {
+                    errorMessage = error.message;
+                }
             }
             
             toast({
@@ -363,23 +377,42 @@ export function ParticipationForm() {
                 headers['Pragma'] = 'no-cache';
             }
 
+            console.log('🔄 Début upload fetch vers:', url);
+            console.log('📁 Taille fichier:', file.size, 'bytes');
+
             const response = await fetch(url, {
                 method: 'PUT',
                 headers,
                 body: file,
                 // 🔧 Timeout plus long pour iOS
-                signal: AbortSignal.timeout(60000), // 60 secondes
+                signal: AbortSignal.timeout(120000), // 2 minutes
             });
             
+            console.log('📡 Réponse upload:', response.status, response.statusText);
+            
             if (!response.ok) {
-                console.error('Upload response:', response.status, response.statusText);
+                const errorText = await response.text().catch(() => 'Pas de détails');
+                console.error('❌ Upload failed:', response.status, errorText);
                 throw new Error(`Upload failed: ${response.status} - ${response.statusText}`);
             }
             
             // Simulation de progression pour iOS
             onProgress(100);
+            console.log('✅ Upload fetch réussi');
         } catch (error) {
-            console.error('Upload fetch error:', error);
+            console.error('❌ Upload fetch error:', error);
+            
+            // 🔧 Diagnostic plus précis de l'erreur
+            if (error instanceof Error) {
+                if (error.name === 'AbortError') {
+                    throw new Error('Upload timeout - Le serveur met trop de temps à répondre');
+                } else if (error.message.includes('Failed to fetch')) {
+                    throw new Error('Erreur réseau - Vérifiez votre connexion internet');
+                } else if (error.message.includes('CORS')) {
+                    throw new Error('Erreur de configuration serveur - Contactez le support');
+                }
+            }
+            
             throw error;
         }
     };
@@ -394,32 +427,39 @@ export function ParticipationForm() {
             const xhr = new XMLHttpRequest();
             
             // 🔧 Timeout plus long
-            xhr.timeout = 60000; // 60 secondes
+            xhr.timeout = 120000; // 2 minutes
+            
+            console.log('🔄 Début upload XHR vers:', url);
+            console.log('📁 Taille fichier:', file.size, 'bytes');
             
             xhr.upload.addEventListener('progress', (event) => {
                 if (event.lengthComputable) {
                     const progress = (event.loaded / event.total) * 100;
+                    console.log(`📊 Progression: ${progress.toFixed(1)}%`);
                     onProgress(progress);
                 }
             });
             
             xhr.addEventListener('load', () => {
-                console.log('XHR response:', xhr.status, xhr.statusText);
+                console.log('📡 XHR response:', xhr.status, xhr.statusText);
                 if (xhr.status >= 200 && xhr.status < 300) {
+                    console.log('✅ Upload XHR réussi');
                     resolve();
                 } else {
+                    const errorText = xhr.responseText || 'Pas de détails';
+                    console.error('❌ XHR failed:', xhr.status, errorText);
                     reject(new Error(`Upload failed: ${xhr.status} - ${xhr.statusText}`));
                 }
             });
             
             xhr.addEventListener('error', (event) => {
-                console.error('XHR error:', event);
-                reject(new Error('Upload failed - Network error'));
+                console.error('❌ XHR error:', event);
+                reject(new Error('Erreur réseau - Vérifiez votre connexion internet'));
             });
             
             xhr.addEventListener('timeout', () => {
-                console.error('XHR timeout');
-                reject(new Error('Upload failed - Timeout'));
+                console.error('⏰ XHR timeout');
+                reject(new Error('Upload timeout - Le serveur met trop de temps à répondre'));
             });
             
             xhr.open('PUT', url);
@@ -444,7 +484,7 @@ export function ParticipationForm() {
         
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                console.log(`Tentative d'upload ${attempt}/${maxRetries}`);
+                console.log(`🔄 Tentative d'upload ${attempt}/${maxRetries}`);
                 
                 if (isIOS) {
                     await uploadWithFetch(url, file, onProgress);
@@ -452,17 +492,19 @@ export function ParticipationForm() {
                     await uploadWithXHR(url, file, onProgress);
                 }
                 
-                console.log('Upload réussi');
+                console.log('✅ Upload réussi');
                 return;
             } catch (error) {
-                console.error(`Tentative ${attempt} échouée:`, error);
+                console.error(`❌ Tentative ${attempt} échouée:`, error);
                 
                 if (attempt === maxRetries) {
                     throw error;
                 }
                 
-                // 🔧 Attendre avant de réessayer
-                await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                // 🔧 Attendre avant de réessayer (délai progressif)
+                const delay = 2000 * attempt; // 2s, 4s, 6s
+                console.log(`⏳ Attente ${delay}ms avant nouvelle tentative...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
     };
