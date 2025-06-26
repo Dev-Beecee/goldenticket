@@ -168,26 +168,30 @@ export function ParticipationForm() {
         setOcrCompleted(false);
 
         try {
-            // Prévisualisation
+            // 🖼️ Étape 0 : Compression et redimensionnement de l'image
+            const compressedFile = await compressImage(file);
+            
+            // Prévisualisation avec l'image compressée
             const preview = await new Promise<string>((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result as string);
                 reader.onerror = () => reject(new Error('Erreur de lecture du fichier'));
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(compressedFile);
             });
             setImagePreview(preview);
-            setImage(file);
+            setImage(compressedFile);
 
-            const fileExt = file.name.split('.').pop();
+            const fileExt = compressedFile.name.split('.').pop();
             const fileName = `${inscriptionId}-${Date.now()}.${fileExt}`;
 
             // 🔗 Étape 1 : Obtenir l'URL pré-signée
+            setUploadProgress(10);
             const signedUrlRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/presigned-url', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     filename: fileName,
-                    type: file.type,
+                    type: compressedFile.type,
                 }),
             });
 
@@ -197,21 +201,18 @@ export function ParticipationForm() {
 
             const { uploadUrl, fileUrl } = await signedUrlRes.json();
 
-            // 🔼 Étape 2 : Upload direct vers S3
-            const uploadRes = await fetch(uploadUrl, {
-                method: 'PUT',
-                headers: { 'Content-Type': file.type },
-                body: file,
+            // 🔼 Étape 2 : Upload direct vers S3 avec progression réelle
+            setUploadProgress(20);
+            await uploadWithProgress(uploadUrl, compressedFile, (progress) => {
+                setUploadProgress(20 + (progress * 0.6)); // 20% à 80%
             });
-
-            if (!uploadRes.ok) {
-                throw new Error("Échec de l'upload vers S3");
-            }
 
             setUploadedImageUrl(fileUrl);
 
             // 🧠 Étape 3 : Appel OCR avec l'URL publique
+            setUploadProgress(80);
             await autoFillWithOCR(fileUrl);
+            setUploadProgress(100);
 
             toast({
                 title: 'Succès',
@@ -227,10 +228,91 @@ export function ParticipationForm() {
             });
         } finally {
             setIsProcessing(false);
-            setUploadProgress(100);
         }
     };
 
+    // 🖼️ Fonction de compression d'image
+    const compressImage = (file: File): Promise<File> => {
+        return new Promise((resolve) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d')!;
+            const img = new Image();
+            
+            img.onload = () => {
+                // Calculer les nouvelles dimensions (max 1200px de large)
+                const maxWidth = 1200;
+                const maxHeight = 1200;
+                let { width, height } = img;
+                
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = (width * maxHeight) / height;
+                        height = maxHeight;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Dessiner l'image redimensionnée
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Convertir en blob avec compression
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now(),
+                        });
+                        resolve(compressedFile);
+                    } else {
+                        resolve(file); // Fallback si compression échoue
+                    }
+                }, 'image/jpeg', 0.8); // Qualité 80%
+            };
+            
+            img.src = URL.createObjectURL(file);
+        });
+    };
+
+    // 📤 Fonction d'upload avec progression réelle
+    const uploadWithProgress = async (
+        url: string, 
+        file: File, 
+        onProgress: (progress: number) => void
+    ): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            
+            xhr.upload.addEventListener('progress', (event) => {
+                if (event.lengthComputable) {
+                    const progress = (event.loaded / event.total) * 100;
+                    onProgress(progress);
+                }
+            });
+            
+            xhr.addEventListener('load', () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve();
+                } else {
+                    reject(new Error(`Upload failed: ${xhr.status}`));
+                }
+            });
+            
+            xhr.addEventListener('error', () => {
+                reject(new Error('Upload failed'));
+            });
+            
+            xhr.open('PUT', url);
+            xhr.setRequestHeader('Content-Type', file.type);
+            xhr.send(file);
+        });
+    };
 
     const findMatchingRestaurant = useCallback((restaurantName: string) => {
         if (!restaurantName) return undefined;
