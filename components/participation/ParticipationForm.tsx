@@ -661,23 +661,25 @@ export function ParticipationForm() {
             }
 
             // ✅ Enregistre la participation via la nouvelle Edge Function
-            console.log('Envoi de la participation à l\'Edge Function avec :', {
+            const participationPayload = {
                 inscription_id: inscriptionId,
                 image_url: uploadedImageUrl,
                 ...values,
-            });
-            console.log('inscription_id:', inscriptionId);
-            console.log('restaurant_id:', values.id);
+            };
+
+            // Supprimer id si vide ou non défini
+            if (!participationPayload.id) {
+                delete participationPayload.id;
+            }
+
+            console.log('Payload participation envoyé :', participationPayload);
+
             const participationRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    inscription_id: inscriptionId,
-                    image_url: uploadedImageUrl,
-                    ...values,
-                }),
+                body: JSON.stringify(participationPayload),
             });
 
             console.log('Réponse brute de la requête participation:', participationRes);
