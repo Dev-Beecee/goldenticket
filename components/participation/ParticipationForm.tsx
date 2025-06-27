@@ -666,6 +666,8 @@ export function ParticipationForm() {
                 image_url: uploadedImageUrl,
                 ...values,
             });
+            console.log('inscription_id:', inscriptionId);
+            console.log('restaurant_id:', values.id);
             const participationRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation', {
                 method: 'POST',
                 headers: {
