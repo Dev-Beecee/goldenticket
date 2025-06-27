@@ -680,13 +680,39 @@ export function ParticipationForm() {
 
             const result = await participationRes.json();
 
+            // On récupère l'id de participation de façon robuste
+            let participationId = null;
+            if (result.participation_id) {
+                participationId = result.participation_id;
+            } else if (result.id) {
+                participationId = result.id;
+            } else if (result.data && result.data.id) {
+                participationId = result.data.id;
+            }
+
+            // Fallback : si toujours pas d'id, on regarde dans le localStorage (rare)
+            if (!participationId && typeof window !== 'undefined') {
+                participationId = localStorage.getItem('last_participation_id');
+            }
+
+            // On stocke l'id pour le cas où l'API ne le renverrait pas la prochaine fois
+            if (participationId && typeof window !== 'undefined') {
+                localStorage.setItem('last_participation_id', participationId);
+            }
+
             // ✅ Redirection ou message selon contient_menu_mxbo
             if (values.contient_menu_mxbo) {
                 // Nouvelle logique : si déjà gagné, redirige vers deja-gagne
-                if (result.result === 'Déjà joué' && result.gain === true && result.participation_id) {
-                    router.push(`/deja-gagne?id=${result.participation_id}`)
+                if (result.result === 'Déjà joué' && result.gain === true && participationId) {
+                    router.push(`/deja-gagne?id=${participationId}`)
+                } else if (participationId) {
+                    router.push(`/game?id=${participationId}`);
                 } else {
-                    router.push(`/game?id=${result.participation_id}`);
+                    toast({
+                        title: 'Erreur',
+                        description: 'Impossible de retrouver l\'identifiant de participation.',
+                        variant: 'destructive',
+                    });
                 }
             } else {
                 toast({
