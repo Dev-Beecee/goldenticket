@@ -96,7 +96,7 @@ export default function QuickValidationCarousel({
                 {/* Infos et statut */}
                 <div className="w-full md:w-1/2 space-y-4 text-black">
                     <div>
-                        <p><strong>Restaurant :</strong> {current.restaurant.nom}</p>
+                        <p><strong>Restaurant :</strong> {current.restaurant?.nom || "Non renseigné"}</p>
                         <p><strong>Nom :</strong> {current.inscription.nom}</p>
                         <p><strong>Prénom :</strong> {current.inscription.prenom}</p>
                         <p><strong>Email :</strong> {current.inscription.email}</p>
