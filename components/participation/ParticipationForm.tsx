@@ -72,10 +72,8 @@ export function ParticipationForm() {
         const id = idFromUrl || idFromStorage
 
         if (id) {
-            console.log('Inscription ID found:', id)
             setInscriptionId(id)
         } else {
-            console.error('No inscription ID found')
             toast({
                 variant: 'default',
                 duration: 5000,
@@ -96,7 +94,6 @@ export function ParticipationForm() {
     useEffect(() => {
         const fetchRestaurants = async () => {
             try {
-                console.log('Fetching restaurants...')
                 const response = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/list-restaurant', {
                     method: 'GET',
                     headers: {
@@ -110,10 +107,8 @@ export function ParticipationForm() {
                 }
 
                 const data = await response.json()
-                console.log('Restaurants loaded:', data.restaurants?.length || 0)
                 setRestaurants(data.restaurants || [])
             } catch (error) {
-                console.error('Error fetching restaurants:', error)
                 toast({
                     variant: 'default',
                     duration: 5000,
@@ -169,7 +164,7 @@ export function ParticipationForm() {
         setOcrCompleted(false);
 
         try {
-            console.log('🚀 Début traitement image');
+            // 🚀 Début traitement image
             // 🖼️ Compression avec browser-image-compression
             const compressedFile = await imageCompression(file, {
                 maxWidthOrHeight: 1000,
@@ -177,7 +172,6 @@ export function ParticipationForm() {
                 useWebWorker: true,
                 initialQuality: 0.8,
             });
-            console.log('📦 Image compressée:', compressedFile.size, 'bytes');
 
             // Prévisualisation avec l'image compressée
             const preview = await new Promise<string>((resolve, reject) => {
@@ -194,7 +188,6 @@ export function ParticipationForm() {
 
             // 🔗 Étape 1 : Obtenir l'URL pré-signée
             setUploadProgress(10);
-            console.log('🔑 Récupération URL pré-signée...');
             const signedUrlRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/presigned-url', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -209,7 +202,6 @@ export function ParticipationForm() {
             }
 
             const { uploadUrl, fileUrl } = await signedUrlRes.json();
-            console.log('🔑 URL pré-signée obtenue');
 
             // 🔼 Étape 2 : Upload direct vers S3 avec retry
             setUploadProgress(20);
@@ -234,7 +226,6 @@ export function ParticipationForm() {
                 variant: 'default',
             });
         } catch (error) {
-            console.error('❌ Erreur upload/image:', error);
             let errorMessage = "Erreur lors de l'upload";
             if (error instanceof Error) {
                 if (error.message.includes('timeout')) {
@@ -307,18 +298,15 @@ export function ParticipationForm() {
                             resolve(compressedFile);
                         } else {
                             // Fallback : utiliser l'image originale
-                            console.warn('Compression échouée, utilisation de l\'image originale');
                             resolve(file);
                         }
                     }, 'image/jpeg', 0.8);
                 } catch (error) {
-                    console.warn('Erreur compression, utilisation de l\'image originale:', error);
                     resolve(file);
                 }
             };
             
             img.onerror = () => {
-                console.warn('Erreur chargement image, utilisation de l\'originale');
                 resolve(file);
             };
             
@@ -382,24 +370,18 @@ export function ParticipationForm() {
                 headers['Cache-Control'] = 'no-cache';
                 headers['Pragma'] = 'no-cache';
             }
-            console.log('🔄 Début upload fetch vers:', url);
-            console.log('📁 Taille fichier:', file.size, 'bytes');
             const response = await fetch(url, {
                 method: 'PUT',
                 headers,
                 body: file,
                 signal: AbortSignal.timeout(120000),
             });
-            console.log('📡 Réponse upload:', response.status, response.statusText);
             if (!response.ok) {
                 const errorText = await response.text().catch(() => 'Pas de détails');
-                console.error('❌ Upload failed:', response.status, errorText);
                 throw new Error(`Upload failed: ${response.status} - ${response.statusText}`);
             }
             onProgress(100);
-            console.log('✅ Upload fetch réussi');
         } catch (error) {
-            console.error('❌ Upload fetch error:', error);
             if (error instanceof Error) {
                 if (error.name === 'AbortError') {
                     throw new Error('Upload timeout - Le serveur met trop de temps à répondre');
@@ -425,36 +407,27 @@ export function ParticipationForm() {
             // 🔧 Timeout plus long
             xhr.timeout = 120000; // 2 minutes
             
-            console.log('🔄 Début upload XHR vers:', url);
-            console.log('📁 Taille fichier:', file.size, 'bytes');
-            
             xhr.upload.addEventListener('progress', (event) => {
                 if (event.lengthComputable) {
                     const progress = (event.loaded / event.total) * 100;
-                    console.log(`📊 Progression: ${progress.toFixed(1)}%`);
                     onProgress(progress);
                 }
             });
             
             xhr.addEventListener('load', () => {
-                console.log('📡 XHR response:', xhr.status, xhr.statusText);
                 if (xhr.status >= 200 && xhr.status < 300) {
-                    console.log('✅ Upload XHR réussi');
                     resolve();
                 } else {
                     const errorText = xhr.responseText || 'Pas de détails';
-                    console.error('❌ XHR failed:', xhr.status, errorText);
                     reject(new Error(`Upload failed: ${xhr.status} - ${xhr.statusText}`));
                 }
             });
             
             xhr.addEventListener('error', (event) => {
-                console.error('❌ XHR error:', event);
                 reject(new Error('Erreur réseau - Vérifiez votre connexion internet'));
             });
             
             xhr.addEventListener('timeout', () => {
-                console.error('⏰ XHR timeout');
                 reject(new Error('Upload timeout - Le serveur met trop de temps à répondre'));
             });
             
@@ -480,7 +453,6 @@ export function ParticipationForm() {
         
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                console.log(`🔄 Tentative d'upload ${attempt}/${maxRetries}`);
                 
                 if (isIOS) {
                     await uploadWithFetch(url, file, onProgress);
@@ -488,10 +460,8 @@ export function ParticipationForm() {
                     await uploadWithXHR(url, file, onProgress);
                 }
                 
-                console.log('✅ Upload réussi');
                 return;
             } catch (error) {
-                console.error(`❌ Tentative ${attempt} échouée:`, error);
                 
                 if (attempt === maxRetries) {
                     throw error;
@@ -499,7 +469,6 @@ export function ParticipationForm() {
                 
                 // 🔧 Attendre avant de réessayer (délai progressif)
                 const delay = 2000 * attempt; // 2s, 4s, 6s
-                console.log(`⏳ Attente ${delay}ms avant nouvelle tentative...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
@@ -525,7 +494,6 @@ export function ParticipationForm() {
         const urlToUse = imageUrl || uploadedImageUrl;
 
         if (!urlToUse) {
-            console.error('Erreur critique: uploadedImageUrl non défini');
             throw new Error("URL de l'image manquante pour l'analyse OCR");
         }
 
@@ -562,18 +530,15 @@ export function ParticipationForm() {
                 const match = findMatchingRestaurant(extracted.ocr_restaurant);
 
                 if (match) {
-                    console.log('Match found, hiding selector');
                     form.setValue('id', match.id);
                     setAutoDetectedRestaurant(match);
                     setShowRestaurantSelect(false); // Cache le sélecteur si correspondance exacte
                 } else {
-                    console.log('No match found, showing selector');
                     setAutoDetectedRestaurant(null);
                     setShowRestaurantSelect(true); // Affiche le sélecteur si pas de correspondance
                     setSearchTerm(extracted.ocr_restaurant);
                 }
             } else {
-                console.log('No restaurant detected, showing selector');
                 setAutoDetectedRestaurant(null);
                 setShowRestaurantSelect(true); // Affiche le sélecteur si aucun nom détecté
                 setSearchTerm('');
@@ -582,7 +547,6 @@ export function ParticipationForm() {
             // Marquer l'OCR comme terminé
             setOcrCompleted(true);
         } catch (error) {
-            console.error('Erreur OCR:', error);
             throw error;
         } finally {
             setIsProcessing(false);
@@ -632,7 +596,6 @@ export function ParticipationForm() {
 
             if (!checkRes.ok) {
                 const result = await checkRes.json();
-                console.log('📛 Réponse Edge Function:', result);
                 
                 // ✅ Enregistre la participation rejetée avec statut 'invalide'
                 const { error: insertError } = await supabase.from('participation').insert([
@@ -645,7 +608,6 @@ export function ParticipationForm() {
                     },
                 ]);
                 if (insertError) {
-                    console.error('Erreur lors de l\'insertion participation invalide:', insertError);
                 }
 
                 toast({
@@ -672,8 +634,6 @@ export function ParticipationForm() {
                 delete participationPayload.id;
             }
 
-            console.log('Payload participation envoyé :', participationPayload);
-
             const participationRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation', {
                 method: 'POST',
                 headers: {
@@ -682,16 +642,12 @@ export function ParticipationForm() {
                 body: JSON.stringify(participationPayload),
             });
 
-            console.log('Réponse brute de la requête participation:', participationRes);
-
             if (!participationRes.ok) {
                 const error = await participationRes.json();
-                console.error('Erreur lors de l\'enregistrement de la participation:', error);
                 throw new Error(error.message || 'Erreur lors de l\'enregistrement');
             }
 
             const result = await participationRes.json();
-            console.log('Résultat JSON de la participation:', result);
 
             // On récupère l'id de participation de façon robuste
             let participationId = null;
@@ -702,7 +658,6 @@ export function ParticipationForm() {
             } else if (result.data && result.data.id) {
                 participationId = result.data.id;
             }
-            console.log('Participation ID récupéré:', participationId);
 
             // Fallback : si toujours pas d'id, on regarde dans le localStorage (rare)
             if (!participationId && typeof window !== 'undefined') {
@@ -752,7 +707,6 @@ export function ParticipationForm() {
             setOcrCompleted(false);
 
         } catch (error) {
-            console.error('Erreur:', error);
             toast({
                 title: 'Erreur',
                 description: error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'enregistrement',
