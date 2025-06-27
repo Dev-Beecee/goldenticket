@@ -629,8 +629,8 @@ export function ParticipationForm() {
                 ...values,
             };
 
-            // Supprimer id si vide ou non défini
-            if (!participationPayload.id) {
+            // Juste avant l'envoi
+            if ('id' in participationPayload) {
                 delete participationPayload.id;
             }
 
