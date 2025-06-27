@@ -661,6 +661,11 @@ export function ParticipationForm() {
             }
 
             // ✅ Enregistre la participation via la nouvelle Edge Function
+            console.log('Envoi de la participation à l\'Edge Function avec :', {
+                inscription_id: inscriptionId,
+                image_url: uploadedImageUrl,
+                ...values,
+            });
             const participationRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation', {
                 method: 'POST',
                 headers: {
@@ -673,12 +678,16 @@ export function ParticipationForm() {
                 }),
             });
 
+            console.log('Réponse brute de la requête participation:', participationRes);
+
             if (!participationRes.ok) {
                 const error = await participationRes.json();
+                console.error('Erreur lors de l\'enregistrement de la participation:', error);
                 throw new Error(error.message || 'Erreur lors de l\'enregistrement');
             }
 
             const result = await participationRes.json();
+            console.log('Résultat JSON de la participation:', result);
 
             // On récupère l'id de participation de façon robuste
             let participationId = null;
@@ -689,6 +698,7 @@ export function ParticipationForm() {
             } else if (result.data && result.data.id) {
                 participationId = result.data.id;
             }
+            console.log('Participation ID récupéré:', participationId);
 
             // Fallback : si toujours pas d'id, on regarde dans le localStorage (rare)
             if (!participationId && typeof window !== 'undefined') {
