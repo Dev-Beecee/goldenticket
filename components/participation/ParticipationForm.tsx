@@ -31,7 +31,7 @@ const schema = z.object({
     ocr_date_achat: z.string().min(6, { message: 'Date invalide' }),
     ocr_montant: z.string().min(1, { message: 'Montant requis' }),
     contient_menu_mxbo: z.boolean(),
-    restaurant_id: z.string().optional(),
+    id: z.string().optional(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -61,7 +61,7 @@ export function ParticipationForm() {
             ocr_date_achat: '',
             ocr_montant: '',
             contient_menu_mxbo: false,
-            restaurant_id: '',
+            id: '',
         },
     })
 
@@ -555,7 +555,7 @@ export function ParticipationForm() {
                 ocr_date_achat: extracted.ocr_date_achat ? convertToHTMLDate(extracted.ocr_date_achat) : '',
                 ocr_montant: extracted.ocr_montant ? extracted.ocr_montant.replace(',', '.').replace(/\s/g, '') : '',
                 contient_menu_mxbo: extracted.contient_menu_mxbo || false,
-                restaurant_id: ''
+                id: ''
             });
 
             if (extracted.ocr_restaurant) {
@@ -563,7 +563,7 @@ export function ParticipationForm() {
 
                 if (match) {
                     console.log('Match found, hiding selector');
-                    form.setValue('restaurant_id', match.id);
+                    form.setValue('id', match.id);
                     setAutoDetectedRestaurant(match);
                     setShowRestaurantSelect(false); // Cache le sélecteur si correspondance exacte
                 } else {
@@ -728,7 +728,7 @@ export function ParticipationForm() {
                 ocr_date_achat: '',
                 ocr_montant: '',
                 contient_menu_mxbo: false,
-                restaurant_id: '',
+                id: '',
             });
             setImage(null);
             setImagePreview(null);
@@ -869,8 +869,8 @@ export function ParticipationForm() {
                                     className="w-full justify-between"
                                     type="button"
                                 >
-                                    {form.watch('restaurant_id')
-                                        ? restaurants.find((r) => r.id === form.watch('restaurant_id'))?.nom
+                                    {form.watch('id')
+                                        ? restaurants.find((r) => r.id === form.watch('id'))?.nom
                                         : "Sélectionner un restaurant..."}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
@@ -889,14 +889,14 @@ export function ParticipationForm() {
                                                 key={r.id}
                                                 value={r.nom}
                                                 onSelect={() => {
-                                                    form.setValue('restaurant_id', r.id)
+                                                    form.setValue('id', r.id)
                                                     setOpen(false)
                                                 }}
                                             >
                                                 <Check
                                                     className={cn(
                                                         "mr-2 h-4 w-4",
-                                                        form.watch('restaurant_id') === r.id ? "opacity-100" : "opacity-0"
+                                                        form.watch('id') === r.id ? "opacity-100" : "opacity-0"
                                                     )}
                                                 />
                                                 {r.nom}
