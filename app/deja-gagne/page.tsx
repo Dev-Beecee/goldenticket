@@ -45,7 +45,7 @@ export default function DejaGagnePage() {
             <div className="w-full max-w-xs text-center">
                 <h1 className="text-2xl font-bold mb-4 text-green-700">Bravo !</h1>
                 {loading ? (
-                    <p className="text-gray-700 mb-4">Chargement de votre lot...</p>
+                    <p className="text-gray-700 mb-4">Chargement de votre lot.....</p>
                 ) : error ? (
                     <p className="text-red-600 mb-4">{error}</p>
                 ) : lot ? (
