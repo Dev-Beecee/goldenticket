@@ -54,6 +54,7 @@ export function ParticipationForm() {
     const [autoDetectedRestaurant, setAutoDetectedRestaurant] = useState<Restaurant | null>(null);
     const [ocrCompleted, setOcrCompleted] = useState(false);
     const { toast } = useToast()
+    const [formattedMontant, setFormattedMontant] = useState('');
 
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
@@ -523,6 +524,7 @@ export function ParticipationForm() {
             }
 
             const extracted = await response.json();
+            
 
             // Validation de la réponse
             if (!extracted || typeof extracted !== 'object') {
@@ -584,6 +586,18 @@ export function ParticipationForm() {
 
         return dateStr
     }
+
+    // Synchroniser le champ montant du formulaire avec le formatage à 2 décimales
+    useEffect(() => {
+        if (ocrCompleted) {
+            const montant = form.getValues('ocr_montant');
+            if (montant) {
+                setFormattedMontant(parseFloat(montant).toFixed(2));
+            } else {
+                setFormattedMontant('');
+            }
+        }
+    }, [ocrCompleted, form]);
 
     const onSubmit = async (values: FormValues) => {
         if (!uploadedImageUrl || !inscriptionId) {
@@ -675,6 +689,9 @@ export function ParticipationForm() {
             if ('id' in participationPayload) {
                 delete participationPayload.id;
             }
+
+            // Dans le onSubmit, s'assurer que le montant est bien formaté à 2 décimales
+            values.ocr_montant = parseFloat(values.ocr_montant).toFixed(2);
 
             const participationRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation', {
                 method: 'POST',
@@ -866,9 +883,19 @@ export function ParticipationForm() {
                         <Label className="text-white" htmlFor="amount">Montant (€) *</Label>
                         <Input
                             id="amount"
-                            type="number"
-                            step="0.01"
-                            {...form.register('ocr_montant')}
+                            type="text"
+                            inputMode="decimal"
+                            pattern="^\\d+(\\.\\d{0,2})?$"
+                            value={formattedMontant}
+                            onChange={e => {
+                                // Autoriser uniquement les chiffres et le point
+                                const val = e.target.value.replace(/[^\d.]/g, '');
+                                // Limiter à 2 décimales
+                                const match = val.match(/^(\d+)(\.(\d{0,2}))?/);
+                                let newValue = match ? match[0] : '';
+                                setFormattedMontant(newValue);
+                                form.setValue('ocr_montant', newValue, { shouldValidate: true });
+                            }}
                             placeholder="0.00"
                             disabled={!!autoDetectedRestaurant}
                         />

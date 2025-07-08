@@ -22,6 +22,9 @@ const formSchema = z.object({
   telephone: z.string().regex(/^(0|\+33)[1-9]([-. ]?[0-9]{2}){4}$/, {
     message: "Veuillez saisir un numéro de téléphone valide.",
   }),
+  certifie_achat_menu: z.boolean().refine(val => val === true, {
+    message: "Vous devez certifier l'achat d'un menu pour participer.",
+  }),
   accepte_reglement: z.boolean().refine(val => val === true, {
     message: "Vous devez accepter le règlement pour participer.",
   }),
@@ -53,6 +56,7 @@ export function RegistrationForm() {
       prenom: '',
       email: '',
       telephone: '',
+      certifie_achat_menu: false,
       accepte_reglement: false,
       accepte_marketing: false,
       utm_source: '',
@@ -250,6 +254,27 @@ export function RegistrationForm() {
 
         {/* Checkboxes */}
         <div className="space-y-4">
+          {/* Certifie achat menu */}
+          <FormField
+            control={form.control}
+            name="certifie_achat_menu"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="font-normal">
+                    Je certifie que ma participation fait suite à l'achat d'un Menu Best Of ou Maxi Best Of dans un restaurant McDonald's de Guadeloupe sur la période du 15 juillet au 31 août 2025.*
+                  </FormLabel>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
           {/* Accepte règlement */}
           <FormField
             control={form.control}
@@ -264,8 +289,7 @@ export function RegistrationForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-normal">
-                    J'accepte le règlement et que mes données soient utilisées dans le cadre du jeu concours *
-                  </FormLabel>
+                  J’accepte que mes données personnelles saisies dans le formulaire soient utilisées pour être recontacté(e) par l’entreprise dans le cadre du jeu.*                  </FormLabel>
                   <FormMessage />
                 </div>
               </FormItem>
@@ -286,7 +310,7 @@ export function RegistrationForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-normal">
-                    J'accepte que mes données soient utilisées à des fins commerciales
+                  J’accepte que mes données personelles saisies dans le formulaire soient utilisées à des fins commerciales.
                   </FormLabel>
                   <FormDescription>
                     Nous respectons votre vie privée et ne partagerons jamais vos informations avec des tiers.

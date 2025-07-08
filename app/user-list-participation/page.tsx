@@ -5,6 +5,15 @@ import { useEffect, useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { UserProfileCard } from '@/components/userprofilecard/UserProfileCard'
 import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogTrigger,
+} from '@/components/ui/dialog'
 
 const fetcher = (url: string, inscriptionId: string) =>
     fetch(url, {
@@ -20,6 +29,7 @@ export default function UserListParticipation() {
     const { toast } = useToast()
     const [data, setData] = useState<any>(null)
     const [loading, setLoading] = useState(true)
+    const [openDialog, setOpenDialog] = useState(false)
 
     useEffect(() => {
         if (!inscriptionId) return
@@ -127,32 +137,61 @@ export default function UserListParticipation() {
                                 </div>
 
                                 {/* Section résultat du tirage */}
-                                <div className={`mt-4 p-3 rounded-lg ${p.has_won ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}`}>
-                                    <div className="flex items-center gap-3">
+                                <div className={`mt-4 p-3 rounded-lg ${p.has_won ? '' : 'bg-gray-50 border border-gray-200'}`}>
+                                    <div className=" items-center gap-3">
                                         {p.has_won ? (
                                             <>
+                                            <div> <p className="font-bold  text-center text-2xl">Tu as gagné !</p></div>
                                                 <div className="flex-shrink-0">
                                                     {p.lot?.photo_url && (
                                                         <Image
                                                             src={p.lot.photo_url}
                                                             alt={p.lot.titre}
-                                                            width={60}
-                                                            height={60}
-                                                            className="rounded-md object-cover"
+                                                            width={120}
+                                                            height={120}
+                                                            className="rounded-md object-cover mx-auto"
                                                         />
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-green-700">Félicitations ! Vous avez gagné</p>
-                                                    <p className="text-green-600">{p.lot?.titre}</p>
-                                                    <p className="text-xs text-green-500">
-                                                        Attribué le {new Date(p.date_attribution).toLocaleDateString('fr-FR')}
-                                                    </p>
+                                                   
+                                                    <p className=" text-center">{p.lot?.titre}</p>
+                                                    
                                                 </div>
+    <div className="mt-4">
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button className="w-full">
+            Comment récupérer mon gain ?
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Récupération de votre gain</DialogTitle>
+            <DialogDescription asChild>
+              <div>
+                {p.lot?.instructions
+                  ? <span dangerouslySetInnerHTML={{ __html: p.lot.instructions }} />
+                  : (
+                    <>
+                      Félicitations pour votre gain ! Pour récupérer votre lot, veuillez suivre les instructions envoyées à votre adresse e-mail enregistrée.<br />
+                      Si vous n'avez pas reçu d'e-mail, veuillez contacter notre support client.
+                    </>
+                  )
+                }
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => document.activeElement && (document.activeElement as HTMLElement).blur()}>
+            Fermer
+          </Button>
+        </DialogContent>
+      </Dialog>
+    </div>
                                             </>
                                         ) : (
                                             <div className="w-full text-center">
-                                                <p className="font-medium text-gray-600">Participation non gagnante</p>
+                                                <p className="font-medium text-gray-600 text-2xl">Tu as perdu !</p>
                                             </div>
                                         )}
                                     </div>
