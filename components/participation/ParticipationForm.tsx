@@ -36,7 +36,7 @@ const schema = z.object({
 })
 
 type FormValues = z.infer<typeof schema>
-type Restaurant = { id: string; nom: string }
+type Restaurant = { id: string; nom: string; code?: string; acronym?: string }
 
 export function ParticipationForm() {
     const router = useRouter()
@@ -483,11 +483,21 @@ export function ParticipationForm() {
         const cleanedInput = restaurantName.toLowerCase().trim();
 
         return restaurants.find(r => {
-            const cleanedRestaurant = r.nom.toLowerCase().trim();
-            // Correspondance exacte ou partielle
-            return cleanedRestaurant === cleanedInput ||
-                cleanedRestaurant.includes(cleanedInput) ||
-                cleanedInput.includes(cleanedRestaurant);
+            const cleanedNom = r.nom.toLowerCase().trim();
+            const cleanedCode = (r.code || '').toLowerCase().trim();
+            const cleanedAcronym = (r.acronym || '').toLowerCase().trim();
+            // Correspondance exacte ou partielle sur nom, code ou acronym
+            return (
+                cleanedNom === cleanedInput ||
+                cleanedNom.includes(cleanedInput) ||
+                cleanedInput.includes(cleanedNom) ||
+                cleanedCode === cleanedInput ||
+                cleanedCode.includes(cleanedInput) ||
+                cleanedInput.includes(cleanedCode) ||
+                cleanedAcronym === cleanedInput ||
+                cleanedAcronym.includes(cleanedInput) ||
+                cleanedInput.includes(cleanedAcronym)
+            );
         });
     }, [restaurants]);
 
