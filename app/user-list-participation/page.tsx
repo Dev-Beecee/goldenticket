@@ -95,12 +95,15 @@ export default function UserListParticipation() {
                     <div className="space-y-6">
                         {data.participations.map((p: any) => (
                             <div key={p.id} className="p-4 border border-[#FFB700] bg-white rounded-lg hover:bg-gray-50">
-                                <div className="flex justify-between items-start mb-3">
+                                <div className="">
                                     <div>
-                                        <h3 className="font-bold text-lg text-[#FF5400]">
+                                        <span>Restaurant détecté:</span>
+                                        <h3 className="font-bold text-lg ">
                                             {p.restaurant?.nom || p.ocr_restaurant}
                                         </h3>
-                                        <div className="flex gap-2 text-sm text-[#FF5400]">
+                                        <div className="flex flex-col gap-2 mt-6">
+                                            <span>Date d'achat:</span>
+                                            <div className="flex items-center gap-2">
                                             <span>
                                                 {new Date(p.ocr_date_achat).toLocaleDateString('fr-FR', {
                                                     day: '2-digit',
@@ -108,15 +111,19 @@ export default function UserListParticipation() {
                                                     year: 'numeric'
                                                 })}
                                             </span>
-                                            <span>•</span>
+                                            <span> à</span>
                                             <span>
                                                 {p.ocr_heure_achat}
                                             </span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <span className="text-lg font-bold text-[#FF5400]">
-                                        {p.ocr_montant} €
-                                    </span>
+                                    <div className="flex flex-col gap-2 mt-6">
+                                        <span>Montant:</span>
+                                        <span className="text-lg font-bold ">
+                                            {p.ocr_montant} €
+                                        </span>
+                                    </div>
                                 </div>
 
                                 {/* Section résultat du tirage */}

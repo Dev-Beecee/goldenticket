@@ -30,6 +30,7 @@ const schema = z.object({
     ocr_restaurant: z.string().min(2, { message: 'Minimum 2 caractères requis' }),
     ocr_date_achat: z.string().min(6, { message: 'Date invalide' }),
     ocr_montant: z.string().min(1, { message: 'Montant requis' }),
+    ocr_heure_achat: z.string().min(5, { message: 'Heure invalide' }).regex(/^\d{2}:\d{2}:\d{2}$/, { message: 'Format attendu HH:MM:SS' }),
     contient_menu_mxbo: z.boolean(),
     id: z.string().optional(),
 })
@@ -60,6 +61,7 @@ export function ParticipationForm() {
             ocr_restaurant: '',
             ocr_date_achat: '',
             ocr_montant: '',
+            ocr_heure_achat: '',
             contient_menu_mxbo: false,
             id: '',
         },
@@ -522,6 +524,7 @@ export function ParticipationForm() {
                 ocr_restaurant: extracted.ocr_restaurant || '',
                 ocr_date_achat: extracted.ocr_date_achat ? convertToHTMLDate(extracted.ocr_date_achat) : '',
                 ocr_montant: extracted.ocr_montant ? extracted.ocr_montant.replace(',', '.').replace(/\s/g, '') : '',
+                ocr_heure_achat: extracted.ocr_heure_achat || '',
                 contient_menu_mxbo: extracted.contient_menu_mxbo || false,
                 id: ''
             });
@@ -585,6 +588,35 @@ export function ParticipationForm() {
         setIsProcessing(true);
 
         try {
+            // ✅ Vérification de doublon
+            const duplicateCheck = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/check-duplicate-participation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ocr_restaurant: values.ocr_restaurant,
+                    ocr_date_achat: values.ocr_date_achat,
+                    ocr_heure_achat: values.ocr_heure_achat,
+                    ocr_montant: values.ocr_montant,
+                }),
+            });
+
+            if (!duplicateCheck.ok) {
+                throw new Error('Erreur lors de la vérification des doublons');
+            }
+
+            const duplicateResult = await duplicateCheck.json();
+            if (duplicateResult.isDuplicate) {
+                toast({
+                    title: 'Ticket déjà soumis',
+                    description: 'Un ticket avec les mêmes informations a déjà été enregistré.',
+                    variant: 'destructive',
+                });
+                setIsProcessing(false);
+                return;
+            }
+
             // ✅ Vérifie la validité de la date via l'Edge Function
             const checkRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/check-periode', {
                 method: 'POST',
@@ -696,6 +728,7 @@ export function ParticipationForm() {
                 ocr_restaurant: '',
                 ocr_date_achat: '',
                 ocr_montant: '',
+                ocr_heure_achat: '',
                 contient_menu_mxbo: false,
                 id: '',
             });
@@ -796,10 +829,25 @@ export function ParticipationForm() {
                                 appearance: 'none'
                             }}
                         />
-
                         {form.formState.errors.ocr_date_achat && (
                             <p className="text-sm text-red-500">
                                 {form.formState.errors.ocr_date_achat.message}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-white" htmlFor="purchase-time">Heure d'achat *</Label>
+                        <Input
+                            id="purchase-time"
+                            type="time"
+                            step="1"
+                            {...form.register('ocr_heure_achat')}
+                            disabled={!!autoDetectedRestaurant}
+                        />
+                        {form.formState.errors.ocr_heure_achat && (
+                            <p className="text-sm text-red-500">
+                                {form.formState.errors.ocr_heure_achat.message}
                             </p>
                         )}
                     </div>

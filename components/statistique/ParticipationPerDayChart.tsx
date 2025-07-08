@@ -67,7 +67,7 @@ export default function ParticipationPerDayChart() {
                 }}
                 formatter={(value) => [value, "Participations"]}
               />
-              <Bar dataKey="participations" fill="#6366f1" />
+              <Bar dataKey="participations" fill="#00000" />
             </BarChart>
           </ResponsiveContainer>
         )}
