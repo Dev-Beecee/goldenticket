@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase-client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 // Types pour le point de gradient
 interface GradientColorPoint {
@@ -31,6 +32,7 @@ export default function GameConfigForm() {
   const [backgroundColors, setBackgroundColors] = useState<GradientColorPoint[]>([{ color: "#ffffff", position: 0, opacity: 1 }]);
   const [reglementFile, setReglementFile] = useState<File | null>(null);
   const [consigneImageFile, setConsigneImageFile] = useState<File | null>(null);
+  const { toast } = useToast();
 
   // Charger la config existante
   useEffect(() => {
@@ -120,6 +122,13 @@ export default function GameConfigForm() {
         background_direction,
         reglement,
         consigne_image_url,
+        texte_color: config?.texte_color || null,
+        button_background_color: config?.button_background_color || null,
+        button_text_color: config?.button_text_color || null,
+        button_border_radius: config?.button_border_radius || null,
+        card_background_color: config?.card_background_color || null,
+        card_border_radius: config?.card_border_radius || null,
+        card_border: config?.card_border || null,
       };
       let res;
       if (config?.id) {
@@ -128,9 +137,17 @@ export default function GameConfigForm() {
         res = await supabase.from("reglage_site").insert(payload);
       }
       if (res.error) throw res.error;
-      alert("Configuration enregistrée !");
+      toast({
+        title: "Succès",
+        description: "Configuration enregistrée !",
+        variant: "default"
+      });
     } catch (e: any) {
-      alert("Erreur : " + e.message);
+      toast({
+        title: "Erreur",
+        description: e.message,
+        variant: "destructive"
+      });
     }
     setLoading(false);
   }
@@ -244,6 +261,34 @@ export default function GameConfigForm() {
         <label>Image de la consigne :</label>
         <Input type="file" accept="image/*" onChange={e => setConsigneImageFile(e.target.files?.[0] || null)} />
         {config?.consigne_image_url && <img src={config.consigne_image_url} alt="aperçu consigne" className="mt-2 max-h-32" />}
+      </div>
+      <div>
+        <label>Couleur du texte du site :</label>
+        <ColorPicker value={config?.texte_color || "#000000"} onChange={v => setConfig((c: any) => ({ ...c, texte_color: v }))} />
+      </div>
+      <div>
+        <label>Couleur de fond du bouton :</label>
+        <ColorPicker value={config?.button_background_color || "#000000"} onChange={v => setConfig((c: any) => ({ ...c, button_background_color: v }))} />
+      </div>
+      <div>
+        <label>Couleur du texte du bouton :</label>
+        <ColorPicker value={config?.button_text_color || "#ffffff"} onChange={v => setConfig((c: any) => ({ ...c, button_text_color: v }))} />
+      </div>
+      <div>
+        <label>Arrondi du bouton (px) :</label>
+        <Input type="number" value={config?.button_border_radius ?? ''} onChange={e => setConfig((c: any) => ({ ...c, button_border_radius: e.target.value }))} />
+      </div>
+      <div>
+        <label>Couleur de fond de la carte :</label>
+        <ColorPicker value={config?.card_background_color || "#ffffff"} onChange={v => setConfig((c: any) => ({ ...c, card_background_color: v }))} />
+      </div>
+      <div>
+        <label>Arrondi de la carte (px) :</label>
+        <Input type="number" value={config?.card_border_radius ?? ''} onChange={e => setConfig((c: any) => ({ ...c, card_border_radius: e.target.value }))} />
+      </div>
+      <div>
+        <label>Style de bordure de la carte (ex: 1px solid #000) :</label>
+        <Input value={config?.card_border || ''} onChange={e => setConfig((c: any) => ({ ...c, card_border: e.target.value }))} />
       </div>
       <Button type="submit" disabled={loading}>{loading ? "Enregistrement…" : "Enregistrer la configuration"}</Button>
     </form>
