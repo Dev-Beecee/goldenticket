@@ -796,7 +796,7 @@ export function ParticipationForm() {
 
                     <label
                         htmlFor="ticket-upload"
-                        className="cursor-pointer px-4 py-2 bg-white shadow  font-bold rounded-full inline-block"
+                        className="cursor-pointer px-4 py-2 btn shadow  font-bold rounded-full inline-block"
                     >
                         PRENDRE UNE PHOTO
                     </label>
@@ -970,7 +970,7 @@ export function ParticipationForm() {
             {ocrCompleted && (
                 <Button
                     type="submit"
-                    className="w-full bg-[#F56B29] text-white rounded-[60px] font-semibold transition hover:bg-[#e44f0d] disabled:opacity-60"
+                    className="w-full btn rounded-[60px] font-semibold transition hover:bg-[#e44f0d] disabled:opacity-60"
                     disabled={isProcessing || !image}
                 >
                     {isProcessing ? (

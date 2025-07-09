@@ -168,7 +168,7 @@ export function RegistrationForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 ">
         {/* Nom & Prénom */}
         <div className="grid gap-6 md:grid-cols-2">
           <FormField
@@ -325,7 +325,7 @@ export function RegistrationForm() {
         <Button
           type="submit"
           className={cn(
-            "w-full transition-all duration-300",
+            "w-full transition-all duration-300 btn",
             isLoading ? "bg-primary/80" : "bg-primary hover:bg-primary/90"
           )}
           disabled={isLoading}
