@@ -37,6 +37,10 @@ const data = {
           url: "/ghost-dashboard/participations",
         },
         {
+          title: "Participations invalide",
+          url: "/ghost-dashboard/participation-invalide",
+        },
+        {
           title: "Gagnants",
           url: "/ghost-dashboard/gagnants",
         },
