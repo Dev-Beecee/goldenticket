@@ -72,10 +72,10 @@ export default function UserListParticipation() {
                 {/* En-tête avec titre à gauche et bouton à droite */}
                 <div className="flex justify-between items-center mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-[#FF5400] mb-2">
+                        <h1 className="text-3xl font-bold  mb-2">
                             {formattedName}
                         </h1>
-                        <p className="text-lg text-[#FF5400]">{participationText}</p>
+                        <p className="text-lg ">{participationText}</p>
                     </div>
                     <button
                         onClick={() => router.back()}
@@ -97,14 +97,14 @@ export default function UserListParticipation() {
                     </button>
                 </div>
 
-                <h2 className="text-2xl font-extrabold text-center text-[#FF5400] uppercase mb-6">
+                <h2 className="text-2xl font-extrabold text-center  uppercase mb-6">
                     Liste de mes participations
                 </h2>
 
                 {data.participations?.length > 0 ? (
                     <div className="space-y-6">
                         {data.participations.map((p: any) => (
-                            <div key={p.id} className="p-4 border border-[#FFB700] bg-white rounded-lg hover:bg-gray-50">
+                            <div key={p.id} className="p-4 border rounded-lg hover:bg-gray-50 card">
                                 <div className="">
                                     <div>
                                         <span>Restaurant détecté:</span>

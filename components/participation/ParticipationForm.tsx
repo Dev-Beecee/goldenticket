@@ -834,7 +834,7 @@ export function ParticipationForm() {
                 <div className="grid gap-4 md:grid-cols-2">
                     {autoDetectedRestaurant && (
                         <div className="space-y-2">
-                            <Label className="text-white" htmlFor="restaurant-name">Nom du restaurant *</Label>
+                            <Label  htmlFor="restaurant-name">Nom du restaurant *</Label>
                             <Input
                                 id="restaurant-name"
                                 {...form.register('ocr_restaurant')}
@@ -845,7 +845,7 @@ export function ParticipationForm() {
                     )}
 
                     <div className="space-y-2">
-                        <Label className="text-white" htmlFor="purchase-date">Date d'achat *</Label>
+                        <Label  htmlFor="purchase-date">Date d'achat *</Label>
                         <Input
                             id="purchase-date"
                             type="date"
@@ -864,7 +864,7 @@ export function ParticipationForm() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-white" htmlFor="purchase-time">Heure d'achat *</Label>
+                        <Label  htmlFor="purchase-time">Heure d'achat *</Label>
                         <Input
                             id="purchase-time"
                             type="time"
@@ -880,7 +880,7 @@ export function ParticipationForm() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-white" htmlFor="amount">Montant (€) *</Label>
+                        <Label  htmlFor="amount">Montant (€) *</Label>
                         <Input
                             id="amount"
                             type="text"
@@ -912,7 +912,7 @@ export function ParticipationForm() {
             {
                 ocrCompleted && showRestaurantSelect && (
                     <div className="space-y-2">
-                        <Label className="text-white">Correspondance restaurant</Label>
+                        <Label >Correspondance restaurant</Label>
                         <Popover open={open} onOpenChange={setOpen}>
                             <PopoverTrigger asChild>
                                 <Button
