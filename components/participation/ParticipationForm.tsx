@@ -564,20 +564,20 @@ export function ParticipationForm() {
         } catch (error) {
             // ✅ Enregistre la participation rejetée avec statut 'invalide' en cas d'erreur OCR
             if (uploadedImageUrl && inscriptionId) {
-                const { error: insertError } = await supabase.from('participation').insert([
-                    {
-                        inscription_id: inscriptionId,
-                        image_url: uploadedImageUrl,
-                        ocr_restaurant: '',
-                        ocr_date_achat: '',
-                        ocr_montant: '',
-                        ocr_heure_achat: '',
-                        contient_menu_mxbo: false,
-                        statut_validation: 'invalide',
-                        raison_invalide: "Impossible de lire les informations du ticket",
-                        created_at: new Date().toISOString(),
-                    },
-                ]);
+                const participationData = {
+                    inscription_id: inscriptionId,
+                    image_url: uploadedImageUrl,
+                    ocr_restaurant: '',
+                    ocr_date_achat: '',
+                    ocr_montant: '',
+                    ocr_heure_achat: '',
+                    contient_menu_mxbo: false,
+                    statut_validation: 'invalide',
+                    raison_invalide: "Impossible de lire les informations du ticket",
+                    created_at: new Date().toISOString(),
+                };
+                
+                const { error: insertError } = await supabase.from('participation').insert([participationData]);
                 if (insertError) {
                     console.error('Erreur lors de l\'enregistrement de la participation invalide:', insertError);
                 }
@@ -653,16 +653,21 @@ export function ParticipationForm() {
             const duplicateResult = await duplicateCheck.json();
             if (duplicateResult.isDuplicate) {
                 // ✅ Enregistre la participation rejetée avec statut 'invalide'
-                const { error: insertError } = await supabase.from('participation').insert([
-                    {
-                        inscription_id: inscriptionId,
-                        image_url: uploadedImageUrl,
-                        ...values,
-                        statut_validation: 'invalide',
-                        raison_invalide: "Un ticket avec les mêmes informations a déjà été enregistré",
-                        created_at: new Date().toISOString(),
-                    },
-                ]);
+                const participationData = {
+                    inscription_id: inscriptionId,
+                    image_url: uploadedImageUrl,
+                    ...values,
+                    statut_validation: 'invalide',
+                    raison_invalide: "Un ticket avec les mêmes informations a déjà été enregistré",
+                    created_at: new Date().toISOString(),
+                };
+                
+                // Supprimer le champ id s'il existe
+                if ('id' in participationData) {
+                    delete participationData.id;
+                }
+                
+                const { error: insertError } = await supabase.from('participation').insert([participationData]);
                 if (insertError) {
                     console.error('Erreur lors de l\'enregistrement de la participation invalide:', insertError);
                 }
@@ -689,16 +694,21 @@ export function ParticipationForm() {
                 const result = await checkRes.json();
                 
                 // ✅ Enregistre la participation rejetée avec statut 'invalide'
-                const { error: insertError } = await supabase.from('participation').insert([
-                    {
-                        inscription_id: inscriptionId,
-                        image_url: uploadedImageUrl,
-                        ...values,
-                        statut_validation: 'invalide',
-                        raison_invalide: result?.error || "La date d'achat ne correspond pas à la période du jeu",
-                        created_at: new Date().toISOString(),
-                    },
-                ]);
+                const participationData = {
+                    inscription_id: inscriptionId,
+                    image_url: uploadedImageUrl,
+                    ...values,
+                    statut_validation: 'invalide',
+                    raison_invalide: result?.error || "La date d'achat ne correspond pas à la période du jeu",
+                    created_at: new Date().toISOString(),
+                };
+                
+                // Supprimer le champ id s'il existe
+                if ('id' in participationData) {
+                    delete participationData.id;
+                }
+                
+                const { error: insertError } = await supabase.from('participation').insert([participationData]);
                 if (insertError) {
                     console.error('Erreur lors de l\'enregistrement de la participation invalide:', insertError);
                 }
@@ -781,16 +791,21 @@ export function ParticipationForm() {
                 }
             } else {
                 // ✅ Enregistre la participation rejetée avec statut 'invalide'
-                const { error: insertError } = await supabase.from('participation').insert([
-                    {
-                        inscription_id: inscriptionId,
-                        image_url: uploadedImageUrl,
-                        ...values,
-                        statut_validation: 'invalide',
-                        raison_invalide: "Votre ticket ne contient pas de menu MXBO",
-                        created_at: new Date().toISOString(),
-                    },
-                ]);
+                const participationData = {
+                    inscription_id: inscriptionId,
+                    image_url: uploadedImageUrl,
+                    ...values,
+                    statut_validation: 'invalide',
+                    raison_invalide: "Votre ticket ne contient pas de menu MXBO",
+                    created_at: new Date().toISOString(),
+                };
+                
+                // Supprimer le champ id s'il existe
+                if ('id' in participationData) {
+                    delete participationData.id;
+                }
+                
+                const { error: insertError } = await supabase.from('participation').insert([participationData]);
                 if (insertError) {
                     console.error('Erreur lors de l\'enregistrement de la participation invalide:', insertError);
                 }
