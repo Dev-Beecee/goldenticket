@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Database } from "@/types/database"
 import DashboardLayout from '@/components/layouts/DashboardLayout'
-import ParticipationsTableWrapper from "@/components/ParticipationsTableWrapper"
+import ParticipationsInvalidesTableWrapper from "@/components/ParticipationsInvalidesTableWrapper"
 import { checkPermission } from "@/lib/server/permit-wrapper"
 
 export default async function ParticipationsPage({
@@ -47,7 +47,7 @@ export default async function ParticipationsPage({
 
     return (
         <DashboardLayout>
-                    <ParticipationsTableWrapper participations={filteredParticipations} />
-                    </DashboardLayout>
+            <ParticipationsInvalidesTableWrapper participations={filteredParticipations} />
+        </DashboardLayout>
     )
 }

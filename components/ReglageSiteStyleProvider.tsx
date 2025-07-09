@@ -6,8 +6,7 @@ export function ReglageSiteStyleProvider({ children }: { children: React.ReactNo
   const { reglage } = useReglageSite();
 
   useEffect(() => {
-    console.log("Valeur de reglage dans le provider:", reglage);
-    if (!reglage) return;
+        if (!reglage) return;
     const body = document.body;
     if (reglage.texte_color) body.style.setProperty("--texte-color", reglage.texte_color);
     if (reglage.button_background_color) body.style.setProperty("--button-background-color", reglage.button_background_color);
