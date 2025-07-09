@@ -6,6 +6,14 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  /* Variables dynamiques personnalisées */
+  --texte-color: #222;
+  --button-background-color: #ffd600;
+  --button-text-color: #222;
+  --button-border-radius: 8px;
+  --card-background-color: #fff;
+  --card-border-radius: 16px;
+  --card-border: 1px solid #eee;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -94,5 +102,16 @@
   }
   body {
     @apply bg-background text-foreground;
+    color: var(--texte-color);
+  }
+  button, .btn, [data-shadcn-ui="button"] {
+    background: var(--button-background-color) !important;
+    color: var(--button-text-color) !important;
+    border-radius: var(--button-border-radius) !important;
+  }
+  .card, [data-shadcn-ui="card"] {
+    background: var(--card-background-color) !important;
+    border-radius: var(--card-border-radius) !important;
+    border: var(--card-border) !important;
   }
 }

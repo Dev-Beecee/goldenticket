@@ -53,8 +53,8 @@ export function UserProfileCard({ inscriptionId }: { inscriptionId: string }) {
                 className="flex items-center justify-between bg-white rounded-2xl px-6 py-4 shadow cursor-pointer hover:shadow-md transition-shadow max-w-md w-full"
             >
                 <div className="basis-[90%]">
-                    <h3 className="font-bold text-center text-orange-600">{formattedName}</h3>
-                    <p className="text-sm text-center text-orange-600">{participationText}</p>
+                    <h3 className="font-bold text-center ">{formattedName}</h3>
+                    <p className="text-sm text-center ">{participationText}</p>
                 </div>
                 <div className="ml-4 text-black basis-[10%]">
                     <svg

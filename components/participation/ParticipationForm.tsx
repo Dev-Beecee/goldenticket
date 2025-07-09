@@ -779,8 +779,8 @@ export function ParticipationForm() {
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl mx-auto p-6 rounded-lg mt-10">
-            <h2 className="text-xl font-semibold text-center text-white">Je tente ma chance</h2>
-            <p className="text-center text-white">Je joins une photo de mon ticket :</p>
+            <h2 className="text-xl font-semibold text-center ">Je tente ma chance</h2>
+            <p className="text-center ">Je joins une photo de mon ticket :</p>
 
             {/* Photo du ticket */}
             <div className="space-y-2">
@@ -796,7 +796,7 @@ export function ParticipationForm() {
 
                     <label
                         htmlFor="ticket-upload"
-                        className="cursor-pointer px-4 py-2 bg-white shadow text-orange-600 font-bold rounded-full inline-block"
+                        className="cursor-pointer px-4 py-2 bg-white shadow  font-bold rounded-full inline-block"
                     >
                         PRENDRE UNE PHOTO
                     </label>

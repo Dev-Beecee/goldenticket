@@ -50,7 +50,7 @@ export default function GagnerPage() {
         fetchLot()
     }, [searchParams])
 
-    return (
+  return (
         <main className="min-h-screen flex flex-col items-center justify-center bg-green-50 p-6">
             <div className="w-full max-w-xs text-center">
                 <h1 className="text-2xl font-bold mb-4 text-green-700">Bravo !</h1>
@@ -81,6 +81,6 @@ export default function GagnerPage() {
                     </>
                 ) : null}
             </div>
-        </main>
+    </main>
     )
 } 

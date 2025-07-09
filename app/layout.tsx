@@ -5,6 +5,9 @@ import { Footer } from '@/components/footer/Footer';
 import { Suspense } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import DynamicBackgroundWrapper from '@/components/DynamicBackgroundWrapper';
+import { ReglageSiteProvider } from "@/hooks/useReglageSite";
+import { ReglageSiteStyles } from '@/components/ReglageSiteStyles';
+import { ReglageSiteStyleProvider } from '@/components/ReglageSiteStyleProvider';
 
 export async function generateMetadata() {
   const supabase = createClient(
@@ -35,16 +38,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <body>
-        <DynamicBackgroundWrapper>
-          <Suspense fallback={null}>
-            {children}
-            <Footer />
-          </Suspense>
-          <Toaster />
-        </DynamicBackgroundWrapper>
-      </body>
-    </html>
+    <ReglageSiteProvider>
+      <html lang="fr" suppressHydrationWarning>
+        <body>
+          <ReglageSiteStyleProvider>
+            <ReglageSiteStyles />
+            <DynamicBackgroundWrapper>
+              <Suspense fallback={null}>
+                {children}
+                <Footer />
+              </Suspense>
+              <Toaster />
+            </DynamicBackgroundWrapper>
+          </ReglageSiteStyleProvider>
+        </body>
+      </html>
+    </ReglageSiteProvider>
   );
 }
