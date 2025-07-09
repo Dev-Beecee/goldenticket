@@ -33,10 +33,11 @@ export default async function ParticipationsPage({
     // Récupération des données
     const { data: participations } = await supabase
         .from("participation")
-        .select("*, boutique: boutique_id (id, nom), inscription: inscription_id (id, nom, prenom, email)")
+        .select("*, restaurant:restaurant_id (id, nom), inscription:inscription_id (id, nom, prenom, email)")
         .in("statut_validation", ["invalide"])
         .order("created_at", { ascending: false })
 
+    console.log('Participations invalides récupérées:', participations)
     const searchTerm = searchParams?.search?.toString().toLowerCase() || ""
 
     const filteredParticipations = participations?.filter((p) =>

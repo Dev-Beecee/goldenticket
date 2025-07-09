@@ -18,10 +18,11 @@ type ParticipationInvalide = {
     };
     ocr_date_achat: string;
     ocr_montant: number;
-    ocr_heure_achat: string;
-    raison_invalide: string;
+    ocr_heure_achat: string | null;
+    raison_invalide: string | null;
     image_url: string | null;
     created_at: string;
+    ocr_restaurant?: string | null;
 };
 
 type ParticipationsInvalidesTableProps = {
@@ -86,7 +87,11 @@ export default function ParticipationsInvalidesTable({
     };
 
     // Fonction pour obtenir la couleur selon la raison d'invalidation
-    const getRaisonColor = (raison: string) => {
+    const getRaisonColor = (raison: string | null) => {
+        if (!raison) {
+            return "bg-gray-100 text-gray-800";
+        }
+        
         if (raison.includes("doublon") || raison.includes("déjà été enregistré")) {
             return "bg-red-100 text-red-800";
         } else if (raison.includes("date") || raison.includes("période")) {
@@ -161,60 +166,67 @@ export default function ParticipationsInvalidesTable({
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {currentItems.map((participation) => (
-                                <tr key={participation.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 text-sm text-gray-900">
-                                        {participation.restaurant?.nom || "Non renseigné"}
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">
-                                        <div>
-                                            <div className="font-medium">
-                                                {participation.inscription.prenom} {participation.inscription.nom}
-                                            </div>
-                                            <div className="text-gray-500 text-xs">
-                                                {participation.inscription.email}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">
-                                        <div>
-                                            <div>{format(parseISO(participation.ocr_date_achat), "dd/MM/yyyy")}</div>
-                                            {participation.ocr_heure_achat && (
-                                                <div className="text-gray-500 text-xs">
-                                                    {participation.ocr_heure_achat}
+                            {currentItems.map((participation) => {
+                                
+                                return (
+                                    <tr key={participation.id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            {participation.restaurant?.nom
+                                                ? participation.restaurant.nom
+                                                : participation.ocr_restaurant
+                                                    ? `${participation.ocr_restaurant} `
+                                                    : "Non renseigné"}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            <div>
+                                                <div className="font-medium">
+                                                    {participation.inscription.prenom} {participation.inscription.nom}
                                                 </div>
+                                                <div className="text-gray-500 text-xs">
+                                                    {participation.inscription.email}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            <div>
+                                                <div>{format(parseISO(participation.ocr_date_achat), "dd/MM/yyyy")}</div>
+                                                {participation.ocr_heure_achat && (
+                                                    <div className="text-gray-500 text-xs">
+                                                        {participation.ocr_heure_achat}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            {participation.ocr_montant} €
+                                        </td>
+                                        <td className="px-6 py-4 text-sm">
+                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRaisonColor(participation.raison_invalide)}`}>
+                                                {participation.raison_invalide || "Raison non spécifiée"}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-500">
+                                            {format(parseISO(participation.created_at), "dd/MM/yyyy HH:mm")}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-500">
+                                            {participation.image_url && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        setSelectedImage(participation.image_url!);
+                                                        setIsModalOpen(true);
+                                                    }}
+                                                    className="flex items-center gap-1 text-indigo-600 hover:text-indigo-900"
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                    Voir
+                                                </Button>
                                             )}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">
-                                        {participation.ocr_montant} €
-                                    </td>
-                                    <td className="px-6 py-4 text-sm">
-                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRaisonColor(participation.raison_invalide)}`}>
-                                            {participation.raison_invalide}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">
-                                        {format(parseISO(participation.created_at), "dd/MM/yyyy HH:mm")}
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">
-                                        {participation.image_url && (
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => {
-                                                    setSelectedImage(participation.image_url!);
-                                                    setIsModalOpen(true);
-                                                }}
-                                                className="flex items-center gap-1 text-indigo-600 hover:text-indigo-900"
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                                Voir
-                                            </Button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

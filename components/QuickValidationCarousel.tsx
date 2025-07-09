@@ -19,6 +19,7 @@ type Participation = {
     ocr_montant: number;
     statut_validation: string;
     image_url: string | null;
+    ocr_restaurant?: string | null;
 };
 
 type QuickValidationCarouselProps = {
@@ -96,7 +97,7 @@ export default function QuickValidationCarousel({
                 {/* Infos et statut */}
                 <div className="w-full md:w-1/2 space-y-4 text-black">
                     <div>
-                        <p><strong>Restaurant :</strong> {current.restaurant?.nom || "Non renseigné"}</p>
+                        <p><strong>Restaurant :</strong> {current.restaurant?.nom || current.ocr_restaurant || "Non renseigné"}</p>
                         <p><strong>Nom :</strong> {current.inscription.nom}</p>
                         <p><strong>Prénom :</strong> {current.inscription.prenom}</p>
                         <p><strong>Email :</strong> {current.inscription.email}</p>
@@ -105,17 +106,25 @@ export default function QuickValidationCarousel({
                     </div>
 
                     <Select
-                        value={current.statut_validation}
-                        onValueChange={(value) => handleStatusChange(current.id, value)}
-                    >
-                        <SelectTrigger className="w-full bg-white text-black border border-gray-300">
-                            <SelectValue placeholder="Changer le statut" className="text-black" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="validé">Validé</SelectItem>
-                            <SelectItem value="rejeté">Rejeté</SelectItem>
-                        </SelectContent>
-                    </Select>
+    value={current.statut_validation || "placeholder"}
+    onValueChange={(value) => handleStatusChange(current.id, value)}
+>
+    <SelectTrigger className="w-full bg-white text-black border border-gray-300">
+        <span className="text-black">
+            {["validé", "rejeté"].includes(current.statut_validation)
+                ? current.statut_validation
+                : "Changer le statut"}
+        </span>
+    </SelectTrigger>
+    <SelectContent>
+        <SelectItem disabled value="placeholder">
+            Changer le statut
+        </SelectItem>
+        <SelectItem value="validé">Validé</SelectItem>
+        <SelectItem value="rejeté">Rejeté</SelectItem>
+    </SelectContent>
+</Select>
+
 
                     <div className="flex justify-between pt-4">
                         <Button

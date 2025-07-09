@@ -17,6 +17,7 @@ type Participation = {
     ocr_montant: number;
     statut_validation: string;
     image_url: string | null;
+    ocr_restaurant?: string | null;
 };
 
 type ParticipationsTableProps = {
@@ -99,7 +100,13 @@ export default function ParticipationsTable({
                         <tbody className="bg-white divide-y divide-gray-200">
                             {currentItems.map((participation) => (
                                 <tr key={participation.id}>
-                                    <td className="px-6 py-4 text-sm text-gray-500">{participation.restaurant?.nom || "Non renseigné"}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-900">
+                                            {participation.restaurant?.nom
+                                                ? participation.restaurant.nom
+                                                : participation.ocr_restaurant
+                                                    ? `${participation.ocr_restaurant} `
+                                                    : "Non renseigné"}
+                                        </td>
                                     <td className="px-6 py-4 text-sm text-gray-500">{participation.inscription.nom}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500">{participation.inscription.prenom}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500">{participation.inscription.email}</td>

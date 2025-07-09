@@ -62,6 +62,7 @@ export default async function ParticipationsPage({
     const { data: participations } = await supabase
         .from("participation")
         .select("*, restaurant:restaurant_id (id, nom), inscription:inscription_id (id, nom, prenom, email)")
+        .not("statut_validation", "in", '("invalide")')
         .order("created_at", { ascending: false })
 
     const searchTerm = searchParams?.search?.toString().toLowerCase() || ""
