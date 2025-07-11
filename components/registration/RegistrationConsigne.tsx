@@ -1,33 +1,47 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Info } from 'lucide-react'
-import { supabase } from "@/lib/supabase-client";
+
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export function RegistrationConsigne() {
-    const [consigneUrl, setConsigneUrl] = useState<string | null>(null);
+  return (
+    <div className="flex flex-col items-center gap-6 max-w-xl mx-auto text-white">
+      
+      {/* Première Card */}
+      <Card className="border-white border bg-transparent text-center">
+        <CardContent className="p-6 flex flex-col items-center gap-4">
+          <p className="text-sm font-medium text-white">Du 15 juillet et 31 août 2025</p>
+          <h2 className="text-lg font-bold underline leading-snug text-white">
+            1 Menu Best of ou Maxi Best Of acheté = 1 chance <br />
+            de remporter un de nos nombreux lots
+          </h2>
+          <p className="text-sm text-white">
+            McDonald's Guadeloupe t'offre la chance de remporter de nombreux cadeaux !
+          </p>
+          <a href="#form">
+            <Button className="bg-yellow-400 text-purple-900 font-bold text-sm px-6 py-2 rounded-full hover:bg-yellow-300 transition">
+              TENTER MA CHANCE
+            </Button>
+          </a>
+        </CardContent>
+      </Card>
 
-    useEffect(() => {
-        (async () => {
-            const { data } = await supabase.from("reglage_site").select("consigne_image_url").limit(1).single();
-            setConsigneUrl(data?.consigne_image_url || null);
-        })();
-    }, []);
-
-    return (
-        <div className="mb-8 text-center">
-            <div className="flex justify-center mb-4">
-                {consigneUrl ? (
-                    <img src={consigneUrl} alt="Consigne" className="h-16 w-16 rounded-full object-cover" />
-                ) : (
-                    <div className="h-16 w-16 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
-                        <Info className="h-8 w-8" />
-                    </div>
-                )}
-            </div>
-            <h2 className="text-2xl font-semibold tracking-tight mb-3">Consignes de participation</h2>
-            <p className="text-muted-foreground max-w-md mx-auto">
-                Veuillez conserver votre preuve d'achat. Assurez-vous de fournir des informations exactes pour que votre demande soit valide. Toute participation incomplète ne sera pas prise en compte.
-            </p>
-        </div>
-    )
+      {/* Deuxième Card */}
+      <Card className="border-white border bg-transparent text-left">
+        <CardContent className="p-6 flex flex-col gap-4">
+          <h3 className="text-lg font-bold text-white">Pour participer, c'est simple</h3>
+          <ul className="list-disc pl-5 space-y-2 text-sm text-white">
+            <li>Inscris-toi en quelques secondes.</li>
+            <li>Prend en photo ton ticket de caisse prouvant l'achat de menu Best Of ou Maxi Best Of.</li>
+            <li>Ton ticket sera analysé automatiquement pour t'offrir une chance de gratter le Golden Ticket !</li>
+          </ul>
+          <p className="text-sm font-bold text-white">Attention :</p>
+          <p className="text-sm text-white">
+            Un ticket = une seule participation, Il ne peut être utilisé qu'une fois. <br />
+            Tu peux retenter ta chance à chaque nouvel achat d'un menu Best Of ou Maxi Best Of.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
