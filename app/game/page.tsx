@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import './GamePage.css'
+import { RegistrationHeader } from '@/components/registration/RegistrationHeader'
 
 export default function GamePage() {
     const searchParams = useSearchParams()
@@ -179,7 +180,9 @@ export default function GamePage() {
                         className="sc__container"
                     />
                     {isLoading && (
+                        
                         <div className="w-full max-w-xs text-center mt-4">
+                            <RegistrationHeader />
                             <div className="w-full bg-gray-300 rounded-full h-2.5 mb-2">
                                 <div className="bg-blue-600 h-2.5 rounded-full animate-pulse w-3/4" />
                             </div>

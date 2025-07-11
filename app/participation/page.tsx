@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ParticipationForm } from '@/components/participation/ParticipationForm'
 import { UserProfileCard } from '@/components/userprofilecard/UserProfileCard'
+import { RegistrationHeader } from '@/components/registration/RegistrationHeader'
 
 export default function ParticipationPage() {
     const searchParams = useSearchParams()
@@ -43,6 +44,7 @@ export default function ParticipationPage() {
                 <div className="flex justify-center mb-8">
                     <UserProfileCard inscriptionId={inscriptionId} />
                 </div>
+                <RegistrationHeader />
                 <ParticipationForm />
             </div>
         </main>

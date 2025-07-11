@@ -1,8 +1,10 @@
+import { RegistrationHeader } from '@/components/registration/RegistrationHeader'
 import React from 'react'
 
 export default function PerduPage() {
     return (
         <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+            <RegistrationHeader />
             <div className="w-full max-w-xs text-center">
                 <h1 className="text-2xl font-bold mb-4">Dommage !</h1>
                 <p className="text-gray-600 mb-4">
