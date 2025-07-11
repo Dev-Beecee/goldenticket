@@ -176,12 +176,12 @@ export function RegistrationForm() {
             name="nom"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nom</FormLabel>
+                <FormLabel className="text-white">Nom</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Nom"
                     {...field}
-                    className="bg-white"
+                    className="bg-[#8A2E92] border-0 border-b border-b-white text-white placeholder:text-white/70 rounded-none"
                     autoComplete="family-name"
                   />
                 </FormControl>
@@ -195,12 +195,12 @@ export function RegistrationForm() {
             name="prenom"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Prénom</FormLabel>
+                <FormLabel className="text-white">Prénom</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Prénom"
                     {...field}
-                    className="bg-white"
+                    className="bg-[#8A2E92] border-0 border-b border-b-white text-white placeholder:text-white/70 rounded-none"
                     autoComplete="given-name"
                   />
                 </FormControl>
@@ -216,13 +216,13 @@ export function RegistrationForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-white">Email</FormLabel>
               <FormControl>
                 <Input
                   type="email"
                   placeholder="votre@email.com"
                   {...field}
-                  className="bg-white"
+                  className="bg-[#8A2E92] border-0 border-b border-b-white text-white placeholder:text-white/70 rounded-none"
                   autoComplete="email"
                 />
               </FormControl>
@@ -237,13 +237,13 @@ export function RegistrationForm() {
           name="telephone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Téléphone</FormLabel>
+              <FormLabel className="text-white">Téléphone</FormLabel>
               <FormControl>
                 <Input
                   type="tel"
                   placeholder="06 12 34 56 78"
                   {...field}
-                  className="bg-white"
+                  className="bg-[#8A2E92] border-0 border-b border-b-white text-white placeholder:text-white/70 rounded-none"
                   autoComplete="tel"
                 />
               </FormControl>
@@ -312,9 +312,7 @@ export function RegistrationForm() {
                   <FormLabel className="font-normal">
                   J’accepte que mes données personelles saisies dans le formulaire soient utilisées à des fins commerciales.
                   </FormLabel>
-                  <FormDescription>
-                    Nous respectons votre vie privée et ne partagerons jamais vos informations avec des tiers.
-                  </FormDescription>
+                  
                 </div>
               </FormItem>
             )}

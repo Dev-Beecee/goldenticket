@@ -27,7 +27,7 @@ export function RegistrationConsigne() {
       </Card>
 
       {/* Deuxième Card */}
-      <Card className="border-white border bg-transparent text-left">
+      <Card className="border-white border bg-transparent text-left mb-[45px]">
         <CardContent className="p-6 flex flex-col gap-4">
           <h3 className="text-lg font-bold text-white">Pour participer, c'est simple</h3>
           <ul className="list-disc pl-5 space-y-2 text-sm text-white">
