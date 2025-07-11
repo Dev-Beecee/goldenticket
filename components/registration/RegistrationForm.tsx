@@ -168,7 +168,7 @@ export function RegistrationForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 ">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" id="form">
         {/* Nom & Prénom */}
         <div className="grid gap-6 md:grid-cols-2">
           <FormField
@@ -333,7 +333,7 @@ export function RegistrationForm() {
         </Button>
 
         {/* Mention bas de page */}
-        <p className="text-center text-xs text-muted-foreground mt-4">
+        <p className="text-center text-xs text-white mt-4">
           * Champs obligatoires
         </p>
       </form>
