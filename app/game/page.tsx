@@ -13,9 +13,10 @@ export default function GamePage() {
     const [isLoading, setIsLoading] = useState(true)
     const [accessDenied, setAccessDenied] = useState(false)
     const [scratchReady, setScratchReady] = useState(false)
-    const [imageResult, setImageResult] = useState('/perdu.jpeg')
+    const [imageResult, setImageResult] = useState('/mcdo-goldenticket-loose.jpg')
     const [lotInstructions, setLotInstructions] = useState('')
     const [lotLoaded, setLotLoaded] = useState(false)
+    const [hasWon, setHasWon] = useState<boolean | null>(null)
 
 
     // Récupération de l'ID
@@ -67,7 +68,7 @@ export default function GamePage() {
 
         const run = async () => {
             try {
-                const res = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/attribuer-lot-force-gain', {
+                const res = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/attribuer-lot', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ participation_id: participationId }),
@@ -87,14 +88,17 @@ export default function GamePage() {
                 if (result.gain) {
                     setImageResult(result.lot.image || '/images/gagne.jpeg');
                     setLotInstructions(result.lot.instructions || '');
+                    setHasWon(true);
                 } else {
-                    setImageResult(result.image || '/images/perdu.jpeg');
+                    setImageResult(result.image || 'mcdo-goldenticket-loose.jpg');
+                    setHasWon(false);
                 }
 
                 setLotLoaded(true);
             } catch (e) {
                 console.error("❌ Erreur lors de l'appel attribuer-lot:", e);
-                setImageResult('/images/perdu.jpeg');
+                setImageResult('mcdo-goldenticket-loose.jpg');
+                setHasWon(false);
                 setLotLoaded(true);
             }
         }
@@ -117,7 +121,7 @@ export default function GamePage() {
                     scratchType: SCRATCH_TYPE.CIRCLE,
                     containerWidth: container.offsetWidth,
                     containerHeight: 300,
-                    imageForwardSrc: '/header.png',
+                    imageForwardSrc: '/mcdo-goldenticket-grat.jpg',
                     imageBackgroundSrc: imageResult,
                     htmlBackground: '',
                     brushSrc: imageResult,
@@ -127,7 +131,7 @@ export default function GamePage() {
                     enabledPercentUpdate: true,
                     percentToFinish: 50,
                     callback: () => {
-                        if (lotInstructions !== null && inscriptionId) {
+                        if (hasWon === true) {
                             router.push('/gagner')
                         } else {
                             router.push('/perdu')
@@ -151,7 +155,7 @@ export default function GamePage() {
         }
 
         setTimeout(init, 100)
-    }, [scratchReady, lotLoaded, imageResult])
+    }, [scratchReady, lotLoaded, imageResult, hasWon])
 
     return (
         <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
