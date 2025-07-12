@@ -845,9 +845,12 @@ export function ParticipationForm() {
     };
 
     return (
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl mx-auto p-6 rounded-lg mt-10">
-            <h2 className="text-xl font-semibold text-center ">Je tente ma chance</h2>
-            <p className="text-center ">Je joins une photo de mon ticket :</p>
+        <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 max-w-2xl mx-auto p-6 rounded-lg mt-10 border border-white text-black"
+        >
+            <h2 className="text-xl font-semibold text-center text-white ">Je tente ma chance</h2>
+            <p className="text-center text-white ">Je joins une photo de mon ticket :</p>
 
             {/* Photo du ticket */}
             <div className="space-y-2">
@@ -901,7 +904,7 @@ export function ParticipationForm() {
                 <div className="grid gap-4 md:grid-cols-2">
                     {autoDetectedRestaurant && (
                         <div className="space-y-2">
-                            <Label  htmlFor="restaurant-name">Nom du restaurant *</Label>
+                            <Label className="text-white" htmlFor="restaurant-name">Nom du restaurant *</Label>
                             <Input
                                 id="restaurant-name"
                                 {...form.register('ocr_restaurant')}
@@ -912,7 +915,7 @@ export function ParticipationForm() {
                     )}
 
                     <div className="space-y-2">
-                        <Label  htmlFor="purchase-date">Date d'achat *</Label>
+                        <Label className="text-white" htmlFor="purchase-date">Date d'achat *</Label>
                         <Input
                             id="purchase-date"
                             type="date"
@@ -931,7 +934,7 @@ export function ParticipationForm() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label  htmlFor="purchase-time">Heure d'achat *</Label>
+                        <Label className="text-white" htmlFor="purchase-time">Heure d'achat *</Label>
                         <Input
                             id="purchase-time"
                             type="time"
@@ -947,7 +950,7 @@ export function ParticipationForm() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label  htmlFor="amount">Montant (€) *</Label>
+                        <Label className="text-white" htmlFor="amount">Montant (€) *</Label>
                         <Input
                             id="amount"
                             type="text"

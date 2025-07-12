@@ -183,10 +183,14 @@ export default function GamePage() {
                         
                         <div className="w-full max-w-xs text-center mt-4">
                             <RegistrationHeader />
+                            <div className="flex flex-col items-center justify-center border border-white">
+                            <h1>Tente ta chance ! </h1>
+                            <h2>Gratte et découvre si ton ticket est gagnant !</h2>
                             <div className="w-full bg-gray-300 rounded-full h-2.5 mb-2">
                                 <div className="bg-blue-600 h-2.5 rounded-full animate-pulse w-3/4" />
                             </div>
                             <p className="text-sm text-gray-600">Chargement du jeu...</p>
+                            </div>
                         </div>
                     )}
                     <div className="sc__infos mt-4 text-center" style={{ display: 'none' }}>Progression : 0%</div>
