@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { RegistrationHeader } from '@/components/registration/RegistrationHeader'
+import ShareButton from '@/components/ShareButton'
 
 export default function GagnerPage() {
     const searchParams = useSearchParams()
@@ -10,14 +11,10 @@ export default function GagnerPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    useEffect(() => {
-        // Priorité à l'ID dans l'URL, fallback sur localStorage
-        const inscriptionIdFromUrl = searchParams.get('id')
-        const inscriptionIdFromStorage = typeof window !== 'undefined'
-            ? localStorage.getItem('inscription_id')
-            : null
-        const inscriptionId = inscriptionIdFromUrl || inscriptionIdFromStorage
+    // Déclare inscriptionId ici
+    const inscriptionId = searchParams.get('id') || (typeof window !== 'undefined' ? localStorage.getItem('inscription_id') : null)
 
+    useEffect(() => {
         if (!inscriptionId) {
             setError('Aucun identifiant d’inscription fourni.')
             setLoading(false)
@@ -52,19 +49,18 @@ export default function GagnerPage() {
     }, [searchParams])
 
   return (
-        <main className="min-h-screen flex flex-col items-center justify-center bg-green-50 p-6">
+        <main className="min-h-screen flex flex-col items-center justify-center  p-6">
             <RegistrationHeader />
-            <div className="w-full max-w-xs text-center">
-                <h1 className="text-2xl font-bold mb-4 text-green-700">Bravo !</h1>
+            <div className="w-full max-w-xs text-center border border-white rounded-lg">
+                <h1 className="text-2xl font-bold mb-4 text-white">Félicitations, tu as gagné !</h1>
                 {loading ? (
-                    <p className="text-gray-700 mb-4">Chargement de votre lot...</p>
+                    <p className="text-white mb-4">Chargement de votre lot...</p>
                 ) : error ? (
                     <p className="text-red-600 mb-4">{error}</p>
                 ) : lot ? (
                     <>
-                        <p className="text-gray-700 mb-4">
-                            Félicitations, vous avez gagné avec ce ticket.<br />
-                            Consultez vos instructions dans votre email !
+                        <p className="text-white mb-4">
+                        Tu remportes :
                         </p>
                         {lot.photo_url && (
                             <img
@@ -80,6 +76,25 @@ export default function GagnerPage() {
                                 dangerouslySetInnerHTML={{ __html: lot.instructions }}
                             />
                         )}
+                        <p className="text-white text-center mt-4">
+                          Un e-mail vient de t’être envoyé avec toutes les instructions pour récupérer ton lot.
+                        </p>
+                        <p className="text-white text-center mt-4">
+                          Pense à vérifier tes spams si tu ne le vois pas dans ta boîte de réception !
+                        </p>
+                        <button
+                          className="btn mt-6"
+                          onClick={() => window.location.href = '/'}
+                        >
+                          Je tente encore ma chance !
+                        </button>
+                        <div className="flex justify-center mt-4">
+                          <ShareButton
+                            inscriptionId={inscriptionId ?? ''}
+                            canal="gagnant"
+                            shareUrl={typeof window !== 'undefined' ? window.location.href : ''}
+                          />
+                        </div>
                     </>
                 ) : null}
             </div>
