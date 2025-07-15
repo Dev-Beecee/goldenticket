@@ -268,7 +268,7 @@ export function RegistrationForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-normal">
-                    Je certifie que ma participation fait suite à l'achat d'un Menu Best Of ou Maxi Best Of dans un restaurant McDonald's de Guadeloupe sur la période du 15 juillet au 31 août 2025.*
+                    Je certifie que ma participation fait suite à l'achat d'un Menu Best Of ou Maxi Best Of dans un restaurant McDonald's de Guadeloupe sur la période du 17 juillet au 31 août 2025.*
                   </FormLabel>
                   <FormMessage />
                 </div>
