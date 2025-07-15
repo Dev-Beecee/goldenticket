@@ -50,7 +50,7 @@ export function UserProfileCard({ inscriptionId }: { inscriptionId: string }) {
         <div className="w-full flex justify-center">
             <div
                 onClick={handleClick}
-                className="flex items-center justify-between bg-white rounded-2xl px-6 py-4 shadow cursor-pointer hover:shadow-md transition-shadow max-w-md w-full"
+                className="flex items-center justify-between  rounded-2xl px-6 py-4 shadow cursor-pointer hover:shadow-md transition-shadow max-w-md w-full border border-white"
             >
                 <div className="basis-[90%]">
                     <h3 className="font-bold text-center ">{formattedName}</h3>
@@ -62,7 +62,7 @@ export function UserProfileCard({ inscriptionId }: { inscriptionId: string }) {
                         className="h-5 w-5"
                         fill="none"
                         viewBox="0 0 24 24"
-                        stroke="#FF5400"
+                        stroke="#FFFFFF"
                     >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
