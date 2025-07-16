@@ -115,10 +115,10 @@ const ShareButtonConfigurator: React.FC<ShareButtonConfiguratorProps> = ({ userI
 
   return (
     <div style={{ border: "1px solid #eee", borderRadius: 8, padding: 24, maxWidth: 400 }}>
-      <h2>Paramétrer le bouton de partage</h2>
+      <h2 className="text-black">Paramétrer le bouton de partage</h2>
       <form onSubmit={e => e.preventDefault()}>
         <div style={{ marginBottom: 12 }}>
-          <label>Image de partage (URL) :</label>
+          <label className="text-black">Image de partage (URL) :</label>
           <input
             type="text"
             value={image}
@@ -148,7 +148,7 @@ const ShareButtonConfigurator: React.FC<ShareButtonConfiguratorProps> = ({ userI
           {isUploading && <div style={{ color: '#888', marginTop: 4 }}>Upload en cours…</div>}
         </div>
         <div style={{ marginBottom: 12 }}>
-          <label>Méta description :</label>
+          <label className="text-black">Méta description :</label>
           <input
             type="text"
             value={metaDescription}
@@ -158,7 +158,7 @@ const ShareButtonConfigurator: React.FC<ShareButtonConfiguratorProps> = ({ userI
           />
         </div>
         <div style={{ marginBottom: 12 }}>
-          <label>Message personnalisé (optionnel) :</label>
+          <label className="text-black">Message personnalisé (optionnel) :</label>
           <input
             type="text"
             value={customMessage}
@@ -168,7 +168,7 @@ const ShareButtonConfigurator: React.FC<ShareButtonConfiguratorProps> = ({ userI
           />
         </div>
         <div style={{ marginBottom: 12 }}>
-          <label>Lien de partage traqué :</label>
+          <label className="text-black">Lien de partage traqué :</label>
           <input type="text" value={trackedUrl} readOnly style={{ width: "100%" }} />
         </div>
         <Button type="button" onClick={handleShare} style={{ marginTop: 16 }}>
@@ -180,7 +180,7 @@ const ShareButtonConfigurator: React.FC<ShareButtonConfiguratorProps> = ({ userI
       </form>
       {image && (
         <div style={{ marginTop: 16 }}>
-          <strong>Aperçu de l'image :</strong>
+          <strong className="text-black">Aperçu de l'image :</strong>
           <div>
             <img src={image} alt="Aperçu" style={{ maxWidth: "100%", maxHeight: 120 }} />
           </div>

@@ -79,7 +79,7 @@ export default function UserListParticipation() {
                     </div>
                     <button
                         onClick={() => router.back()}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#FF5400] text-white rounded-lg hover:bg-[#E04B00] transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 rounded-[40px] border border-white bg-[#FFBC0D] text-[#8A2E92] transition-colors"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +137,7 @@ export default function UserListParticipation() {
                                 </div>
 
                                 {/* Section résultat du tirage */}
-                                <div className={`mt-4 p-3 rounded-lg ${p.has_won ? '' : 'bg-gray-50 border border-gray-200'}`}>
+                                <div className={`mt-4 p-3 rounded-lg ${p.has_won ? '' : ''}`}>
                                     <div className=" items-center gap-3">
                                         {p.has_won ? (
                                             <>
@@ -191,7 +191,7 @@ export default function UserListParticipation() {
                                             </>
                                         ) : (
                                             <div className="w-full text-center">
-                                                <p className="font-medium text-gray-600 text-2xl">Tu as perdu !</p>
+                                                <p className="font-medium text-white text-2xl">Tu as perdu !</p>
                                             </div>
                                         )}
                                     </div>

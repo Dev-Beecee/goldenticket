@@ -177,22 +177,22 @@ export default function GameConfigForm() {
 
   return (
     <form className="space-y-6 max-w-xl" onSubmit={e => { e.preventDefault(); handleSave(); }}>
-      <h2 className="text-xl font-bold mb-2">Configuration du jeu</h2>
+      <h2 className="text-xl font-bold mb-2 text-black">Configuration du jeu</h2>
       <div>
-        <label>Image de partage :</label>
+        <label className="text-black">Image de partage :</label>
         <Input type="file" accept="image/*" onChange={e => setImagePartageFile(e.target.files?.[0] || null)} />
         {config?.image_partage_url && <img src={config.image_partage_url} alt="aperçu partage" className="mt-2 max-h-32" />}
       </div>
       <div>
-        <label>Méta-titre :</label>
+        <label className="text-black">Méta-titre :</label>
         <Input value={config?.meta_title || ""} onChange={e => setConfig((c: any) => ({ ...c, meta_title: e.target.value }))} />
       </div>
       <div>
-        <label>Méta-description :</label>
+        <label className="text-black">Méta-description :</label>
         <Input value={config?.meta_description || ""} onChange={e => setConfig((c: any) => ({ ...c, meta_description: e.target.value }))} />
       </div>
       <div>
-        <label>Type de background :</label>
+        <label className="text-black">Type de background :</label>
         <select value={backgroundType} onChange={e => setBackgroundType(e.target.value as any)} className="border rounded p-2 ml-2">
           <option value="solid">Couleur unie</option>
           <option value="linear-gradient">Dégradé linéaire</option>
@@ -201,7 +201,7 @@ export default function GameConfigForm() {
       {backgroundType === "linear-gradient" && (
         <div className="border p-3 rounded mt-2 bg-gray-50">
           <div className="mb-2">
-            <label>Direction du gradient :</label>
+            <label className="text-black">Direction du gradient :</label>
             <select value={backgroundDirection} onChange={e => setBackgroundDirection(e.target.value)} className="border rounded p-2 ml-2">
               <option value="to right">→ Horizontal (to right)</option>
               <option value="to left">← Horizontal (to left)</option>
@@ -216,15 +216,15 @@ export default function GameConfigForm() {
             )}
           </div>
           <div>
-            <label>Points de couleur :</label>
+            <label className="text-black">Points de couleur :</label>
             <div className="flex flex-col gap-2 mt-2">
               {backgroundColors.map((pt, idx) => (
                 <div key={idx} className="flex items-center gap-2">
                   <ColorPicker value={pt.color} onChange={v => setBackgroundColors(colors => colors.map((c, i) => i === idx ? { ...c, color: v } : c))} />
                   <input type="number" min={0} max={100} value={pt.position} onChange={e => setBackgroundColors(colors => colors.map((c, i) => i === idx ? { ...c, position: Number(e.target.value) } : c))} className="w-16 border rounded p-1" />
-                  <span>%</span>
+                  <span className="text-black">%</span>
                   <input type="number" min={0} max={1} step={0.01} value={pt.opacity} onChange={e => setBackgroundColors(colors => colors.map((c, i) => i === idx ? { ...c, opacity: Number(e.target.value) } : c))} className="w-16 border rounded p-1" />
-                  <span>opacité</span>
+                  <span className="text-black">opacité</span>
                   {backgroundColors.length > 2 && (
                     <Button type="button" size="sm" variant="destructive" onClick={() => setBackgroundColors(colors => colors.filter((_, i) => i !== idx))}>-</Button>
                   )}
@@ -234,60 +234,60 @@ export default function GameConfigForm() {
             </div>
           </div>
           <div className="mt-4">
-            <label>Aperçu du gradient :</label>
+            <label className="text-black">Aperçu du gradient :</label>
             <div className="h-16 w-full rounded" style={{ background: getGradientCSS(), border: "1px solid #ccc" }} />
           </div>
         </div>
       )}
       {backgroundType === "solid" && (
         <div className="flex items-center gap-2 mt-2">
-          <label>Couleur de fond :</label>
+          <label className="text-black">Couleur de fond :</label>
           <ColorPicker value={backgroundColors[0]?.color || "#ffffff"} onChange={v => setBackgroundColors([{ ...backgroundColors[0], color: v }])} />
         </div>
       )}
       <div>
-        <label>Règlement du jeu (PDF ou texte) :</label>
+        <label className="text-black">Règlement du jeu (PDF ou texte) :</label>
         <Input type="file" accept=".pdf,.txt,.doc,.docx" onChange={e => setReglementFile(e.target.files?.[0] || null)} />
         {config?.reglement && (
           <a href={config.reglement} target="_blank" rel="noopener noreferrer" className="block mt-2 text-blue-600 underline">Télécharger le règlement actuel</a>
         )}
       </div>
       <div>
-        <label>Image du header :</label>
+        <label className="text-black">Image du header :</label>
         <Input type="file" accept="image/*" onChange={e => setHeaderImageFile(e.target.files?.[0] || null)} />
         {config?.header_image_url && <img src={config.header_image_url} alt="aperçu header" className="mt-2 max-h-32" />}
       </div>
       <div>
-        <label>Image de la consigne :</label>
+        <label className="text-black">Image de la consigne :</label>
         <Input type="file" accept="image/*" onChange={e => setConsigneImageFile(e.target.files?.[0] || null)} />
         {config?.consigne_image_url && <img src={config.consigne_image_url} alt="aperçu consigne" className="mt-2 max-h-32" />}
       </div>
       <div>
-        <label>Couleur du texte du site :</label>
+        <label className="text-black">Couleur du texte du site :</label>
         <ColorPicker value={config?.texte_color || "#000000"} onChange={v => setConfig((c: any) => ({ ...c, texte_color: v }))} />
       </div>
       <div>
-        <label>Couleur de fond du bouton :</label>
+        <label className="text-black">Couleur de fond du bouton :</label>
         <ColorPicker value={config?.button_background_color || "#000000"} onChange={v => setConfig((c: any) => ({ ...c, button_background_color: v }))} />
       </div>
       <div>
-        <label>Couleur du texte du bouton :</label>
+        <label className="text-black">Couleur du texte du bouton :</label>
         <ColorPicker value={config?.button_text_color || "#ffffff"} onChange={v => setConfig((c: any) => ({ ...c, button_text_color: v }))} />
       </div>
       <div>
-        <label>Arrondi du bouton (px) :</label>
+        <label className="text-black">Arrondi du bouton (px) :</label>
         <Input type="number" value={config?.button_border_radius ?? ''} onChange={e => setConfig((c: any) => ({ ...c, button_border_radius: e.target.value }))} />
       </div>
       <div>
-        <label>Couleur de fond de la carte :</label>
+        <label className="text-black">Couleur de fond de la carte :</label>
         <ColorPicker value={config?.card_background_color || "#ffffff"} onChange={v => setConfig((c: any) => ({ ...c, card_background_color: v }))} />
       </div>
       <div>
-        <label>Arrondi de la carte (px) :</label>
+        <label className="text-black">Arrondi de la carte (px) :</label>
         <Input type="number" value={config?.card_border_radius ?? ''} onChange={e => setConfig((c: any) => ({ ...c, card_border_radius: e.target.value }))} />
       </div>
       <div>
-        <label>Style de bordure de la carte (ex: 1px solid #000) :</label>
+        <label className="text-black">Style de bordure de la carte (ex: 1px solid #000) :</label>
         <Input value={config?.card_border || ''} onChange={e => setConfig((c: any) => ({ ...c, card_border: e.target.value }))} />
       </div>
       <Button type="submit" disabled={loading}>{loading ? "Enregistrement…" : "Enregistrer la configuration"}</Button>
