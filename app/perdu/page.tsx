@@ -9,7 +9,7 @@ export default function PerduPage() {
     return (
         <main className="min-h-screen flex flex-col items-center justify-center  ">
             <RegistrationHeader />
-            <div className="w-full max-w-xs text-center border border-white" style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'white', borderRadius: 16, padding: '26px 16px' }}>
+            <div className="w-full max-w-xs text-center border border-white" style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'white', borderRadius: 16, padding: '26px 16px',  }} >
                 <h1 className="text-2xl font-bold mb-4">Dommage !</h1>
                 <p className="text-white font-bold mb-4">
                 Malheureusement, tu n’as pas gagné cette fois, mais ne t’en fais pas…

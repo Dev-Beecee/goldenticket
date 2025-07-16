@@ -730,6 +730,7 @@ export function ParticipationForm() {
                 inscription_id: inscriptionId,
                 image_url: uploadedImageUrl,
                 ...values,
+                statut_validation: 'validéia', // Ajout du statut pour les participations validées par l'OCR
             };
 
             // Juste avant l'envoi

@@ -52,7 +52,7 @@ export default function GagnerPage() {
     const router = useRouter()
 
   return (
-        <main className="min-h-screen flex flex-col items-center justify-center  p-6">
+        <main className="min-h-screen flex flex-col items-center justify-center ">
             <RegistrationHeader />
             <div className="w-full max-w-xs text-center border border-white rounded-lg">
                 <h1 className="text-2xl font-bold mb-4 text-white">Félicitations, tu as gagné !</h1>
