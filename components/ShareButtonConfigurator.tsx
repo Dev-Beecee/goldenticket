@@ -153,7 +153,7 @@ const ShareButtonConfigurator: React.FC<ShareButtonConfiguratorProps> = ({ userI
             value={metaDescription}
             onChange={e => setMetaDescription(e.target.value)}
             placeholder="Décrivez le partage..."
-            style={{ width: "100%" }}
+            style={{ width: "100%", color: 'black' }}
           />
         </div>
         <div style={{ marginBottom: 12 }}>
@@ -163,7 +163,7 @@ const ShareButtonConfigurator: React.FC<ShareButtonConfiguratorProps> = ({ userI
             value={customMessage}
             onChange={e => setCustomMessage(e.target.value)}
             placeholder="Viens jouer avec moi !"
-            style={{ width: "100%" }}
+            style={{ width: "100%", color: 'black' }}
           />
         </div>
         <div style={{ marginBottom: 12 }}>
