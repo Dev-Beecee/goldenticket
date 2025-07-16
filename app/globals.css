@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Déclarations de police Speede */
+@font-face {
+  font-family: 'Speede';
+  src: url('/fonts/speede/speede-app.woff2') format('woff2'),
+       url('/fonts/speede/speede-app.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Speede';
+  src: url('/fonts/speede/speede-app-bold.woff2') format('woff2'),
+       url('/fonts/speede/speede-app-bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Speede';
+  src: url('/fonts/speede/speede-app-light.woff2') format('woff2'),
+       url('/fonts/speede/speede-app-light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;

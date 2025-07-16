@@ -8,6 +8,17 @@ import DynamicBackgroundWrapper from '@/components/DynamicBackgroundWrapper';
 import { ReglageSiteProvider } from "@/hooks/useReglageSite";
 import { ReglageSiteStyles } from '@/components/ReglageSiteStyles';
 import { ReglageSiteStyleProvider } from '@/components/ReglageSiteStyleProvider';
+import localFont from 'next/font/local';
+
+const speede = localFont({
+  src: [
+    { path: './fonts/speedee-app-light.woff2', weight: '300', style: 'normal' },
+    { path: './fonts/speedee-app.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/speedee-app-bold.woff2', weight: '700', style: 'normal' },
+  ],
+  display: 'swap',
+});
+
 
 export async function generateMetadata() {
   const supabase = createClient(
@@ -40,7 +51,7 @@ export default function RootLayout({
   return (
     <ReglageSiteProvider>
       <html lang="fr" suppressHydrationWarning>
-        <body>
+        <body className={speede.className}>
           <ReglageSiteStyleProvider>
             <ReglageSiteStyles />
             <DynamicBackgroundWrapper>
