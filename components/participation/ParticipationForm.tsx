@@ -882,7 +882,7 @@ export function ParticipationForm() {
                                 style={{ width: `${uploadProgress}%` }}
                             />
                         </div>
-                        <p className="text-xs text-right mt-1">
+                        <p className="text-xs text-right mt-1 text-white">
                             {uploadProgress}% complété
                         </p>
                     </div>
@@ -911,6 +911,7 @@ export function ParticipationForm() {
                                 {...form.register('ocr_restaurant')}
                                 placeholder="Nom sur le ticket"
                                 disabled
+                                className="text-left"
                             />
                         </div>
                     )}
@@ -926,6 +927,7 @@ export function ParticipationForm() {
                                 WebkitAppearance: 'none',
                                 appearance: 'none'
                             }}
+                            className="text-left"
                         />
                         {form.formState.errors.ocr_date_achat && (
                             <p className="text-sm text-red-500">
@@ -942,6 +944,7 @@ export function ParticipationForm() {
                             step="1"
                             {...form.register('ocr_heure_achat')}
                             disabled={!!autoDetectedRestaurant}
+                            className="text-left"
                         />
                         {form.formState.errors.ocr_heure_achat && (
                             <p className="text-sm text-red-500">
@@ -969,6 +972,7 @@ export function ParticipationForm() {
                             }}
                             placeholder="0.00"
                             disabled={!!autoDetectedRestaurant}
+                            className="text-left"
                         />
                         {form.formState.errors.ocr_montant && (
                             <p className="text-sm text-red-500">

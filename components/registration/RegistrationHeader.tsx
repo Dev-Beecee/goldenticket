@@ -16,7 +16,7 @@ export function RegistrationHeader() {
     <div className="mb-8 text-center">
       <img
         src={headerUrl || ""}
-        alt="Visuel Golden Ticket"
+        alt=""
         className="mx-auto max-w-full h-auto"
       />
     </div>

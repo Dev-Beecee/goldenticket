@@ -20,6 +20,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline underline"
+                style={{ fontWeight: 700 }}
             >
                Voir le règlement du jeu
             </a>

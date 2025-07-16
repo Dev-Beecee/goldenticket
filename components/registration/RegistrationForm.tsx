@@ -326,10 +326,12 @@ export function RegistrationForm() {
             "w-full transition-all duration-300 btn",
             isLoading ? "bg-primary/80" : "bg-primary hover:bg-primary/90"
           )}
+          style={{ fontWeight: 700 }}
           disabled={isLoading}
         >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {hasParticipated ? "Retenter ma chance" : "Valider mon inscription"}
+         
         </Button>
 
         {/* Mention bas de page */}

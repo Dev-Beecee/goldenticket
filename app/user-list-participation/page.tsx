@@ -104,7 +104,7 @@ export default function UserListParticipation() {
                 {data.participations?.length > 0 ? (
                     <div className="space-y-6">
                         {data.participations.map((p: any) => (
-                            <div key={p.id} className="p-4 border rounded-lg hover:bg-gray-50 card">
+                            <div key={p.id} className="p-4 border rounded-lg  ">
                                 <div className="">
                                     <div>
                                         <span>Restaurant détecté:</span>
@@ -113,7 +113,7 @@ export default function UserListParticipation() {
                                         </h3>
                                         <div className="flex flex-col gap-2 mt-6">
                                             <span>Date d'achat:</span>
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 font-bold">
                                             <span>
                                                 {new Date(p.ocr_date_achat).toLocaleDateString('fr-FR', {
                                                     day: '2-digit',
@@ -141,7 +141,7 @@ export default function UserListParticipation() {
                                     <div className=" items-center gap-3">
                                         {p.has_won ? (
                                             <>
-                                            <div> <p className="font-bold  text-center text-2xl">Tu as gagné !</p></div>
+                                            <div> <p className="font-bold  text-center text-2xl" style={{ fontWeight: 700 }}>Tu as gagné !</p></div>
                                                 <div className="flex-shrink-0">
                                                     {p.lot?.photo_url && (
                                                         <Image
@@ -155,7 +155,7 @@ export default function UserListParticipation() {
                                                 </div>
                                                 <div>
                                                    
-                                                    <p className=" text-center">{p.lot?.titre}</p>
+                                                    <p className=" text-center" style={{ fontWeight: 700 }}>{p.lot?.titre}</p>
                                                     
                                                 </div>
     <div className="mt-4">
