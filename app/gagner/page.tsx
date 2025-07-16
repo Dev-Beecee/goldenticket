@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { RegistrationHeader } from '@/components/registration/RegistrationHeader'
 import ShareButton from '@/components/ShareButton'
+import { useRouter } from 'next/navigation'
 
 export default function GagnerPage() {
     const searchParams = useSearchParams()
@@ -48,6 +49,8 @@ export default function GagnerPage() {
         fetchLot()
     }, [searchParams])
 
+    const router = useRouter()
+
   return (
         <main className="min-h-screen flex flex-col items-center justify-center  p-6">
             <RegistrationHeader />
@@ -82,19 +85,18 @@ export default function GagnerPage() {
                         <p className="text-white text-center mt-4">
                           Pense à vérifier tes spams si tu ne le vois pas dans ta boîte de réception !
                         </p>
-                        <button
-                          className="btn mt-6"
-                          onClick={() => window.location.href = '/'}
-                        >
-                          Je tente encore ma chance !
-                        </button>
-                        <div className="flex justify-center mt-4">
-                          <ShareButton
-                            inscriptionId={inscriptionId ?? ''}
-                            canal="gagnant"
-                            shareUrl={typeof window !== 'undefined' ? window.location.href : ''}
-                          />
-                        </div>
+                        <div className="flex flex-col gap-4 mt-6">
+                    <button
+                        className="font-bold py-2 px-4"
+                        style={{ color: '#8A2E92', border: '1px solid white', borderRadius: 40, background: '#FFBC0D' }}
+                        onClick={() => router.push('/')}
+                    >
+                        Je tente encore ma chance
+                    </button>
+                    <ShareButton inscriptionId="demo" canal="autre" shareUrl={typeof window !== 'undefined' ? window.location.href : ''}>
+                    Partager ce jeu À mes amis !
+                    </ShareButton>
+                </div>
                     </>
                 ) : null}
             </div>

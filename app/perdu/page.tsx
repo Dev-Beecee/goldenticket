@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 export default function PerduPage() {
     const router = useRouter();
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center  p-6">
+        <main className="min-h-screen flex flex-col items-center justify-center  ">
             <RegistrationHeader />
             <div className="w-full max-w-xs text-center border border-white" style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'white', borderRadius: 16, padding: '26px 16px' }}>
                 <h1 className="text-2xl font-bold mb-4">Dommage !</h1>
