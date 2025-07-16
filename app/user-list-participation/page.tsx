@@ -14,6 +14,7 @@ import {
     DialogDescription,
     DialogTrigger,
 } from '@/components/ui/dialog'
+import { RegistrationHeader } from '@/components/registration/RegistrationHeader'
 
 const fetcher = (url: string, inscriptionId: string) =>
     fetch(url, {
@@ -67,97 +68,99 @@ export default function UserListParticipation() {
             : `${participationCount} participations enregistrées`
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="max-w-4xl mx-auto">
-                {/* En-tête avec titre à gauche et bouton à droite */}
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-3xl font-bold  mb-2">
-                            {formattedName}
-                        </h1>
-                        <p className="text-lg ">{participationText}</p>
-                    </div>
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center gap-2 px-4 py-2 rounded-[40px] border border-white bg-[#FFBC0D] text-[#8A2E92] transition-colors"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
+        <>
+            <div><RegistrationHeader /></div>
+            <div className="container mx-auto px-4 py-8">
+                <div className="max-w-4xl mx-auto">
+                    {/* En-tête avec titre à gauche et bouton à droite */}
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 className="text-3xl font-bold  mb-2">
+                                {formattedName}
+                            </h1>
+                            <p className="text-lg ">{participationText}</p>
+                        </div>
+                        <button
+                            onClick={() => router.back()}
+                            className="flex items-center gap-2 px-4 py-2 rounded-[40px] border border-white bg-[#FFBC0D] text-[#8A2E92] transition-colors"
                         >
-                            <path
-                                fillRule="evenodd"
-                                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
-                        Retour
-                    </button>
-                </div>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                            Retour
+                        </button>
+                    </div>
 
-                <h2 className="text-2xl font-extrabold text-center  uppercase mb-6">
-                    Liste de mes participations
-                </h2>
+                    <h2 className="text-2xl font-extrabold text-center  uppercase mb-6">
+                        Liste de mes participations
+                    </h2>
 
-                {data.participations?.length > 0 ? (
-                    <div className="space-y-6">
-                        {data.participations.map((p: any) => (
-                            <div key={p.id} className="p-4 border rounded-lg  ">
-                                <div className="">
-                                    <div>
-                                        <span>Restaurant détecté:</span>
-                                        <h3 className="font-bold text-lg ">
-                                            {p.restaurant?.nom || p.ocr_restaurant}
-                                        </h3>
-                                        <div className="flex flex-col gap-2 mt-6">
-                                            <span>Date d'achat:</span>
-                                            <div className="flex items-center gap-2 font-bold">
-                                            <span>
-                                                {new Date(p.ocr_date_achat).toLocaleDateString('fr-FR', {
-                                                    day: '2-digit',
-                                                    month: 'long',
-                                                    year: 'numeric'
-                                                })}
-                                            </span>
-                                            <span> à</span>
-                                            <span>
-                                                {p.ocr_heure_achat}
-                                            </span>
+                    {data.participations?.length > 0 ? (
+                        <div className="space-y-6">
+                            {data.participations.map((p: any) => (
+                                <div key={p.id} className="p-4 border rounded-lg  ">
+                                    <div className="">
+                                        <div>
+                                            <span>Restaurant détecté:</span>
+                                            <h3 className="font-bold text-lg ">
+                                                {p.restaurant?.nom || p.ocr_restaurant}
+                                            </h3>
+                                            <div className="flex flex-col gap-2 mt-6">
+                                                <span>Date d'achat:</span>
+                                                <div className="flex items-center gap-2 font-bold">
+                                                <span>
+                                                    {new Date(p.ocr_date_achat).toLocaleDateString('fr-FR', {
+                                                        day: '2-digit',
+                                                        month: 'long',
+                                                        year: 'numeric'
+                                                    })}
+                                                </span>
+                                                <span> à</span>
+                                                <span>
+                                                    {p.ocr_heure_achat}
+                                                </span>
+                                                </div>
                                             </div>
                                         </div>
+                                        <div className="flex flex-col gap-2 mt-6">
+                                            <span>Montant:</span>
+                                            <span className="text-lg font-bold ">
+                                                {p.ocr_montant} €
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col gap-2 mt-6">
-                                        <span>Montant:</span>
-                                        <span className="text-lg font-bold ">
-                                            {p.ocr_montant} €
-                                        </span>
-                                    </div>
-                                </div>
 
-                                {/* Section résultat du tirage */}
-                                <div className={`mt-4 p-3 rounded-lg ${p.has_won ? '' : ''}`}>
-                                    <div className=" items-center gap-3">
-                                        {p.has_won ? (
-                                            <>
-                                            <div> <p className="font-bold  text-center text-2xl" style={{ fontWeight: 700 }}>Tu as gagné !</p></div>
-                                                <div className="flex-shrink-0">
-                                                    {p.lot?.photo_url && (
-                                                        <Image
-                                                            src={p.lot.photo_url}
-                                                            alt={p.lot.titre}
-                                                            width={120}
-                                                            height={120}
-                                                            className="rounded-md object-cover mx-auto"
-                                                        />
-                                                    )}
-                                                </div>
-                                                <div>
-                                                   
-                                                    <p className=" text-center" style={{ fontWeight: 700 }}>{p.lot?.titre}</p>
-                                                    
-                                                </div>
+                                    {/* Section résultat du tirage */}
+                                    <div className={`mt-4 p-3 rounded-lg ${p.has_won ? '' : ''}`}>
+                                        <div className=" items-center gap-3">
+                                            {p.has_won ? (
+                                                <>
+                                                <div> <p className="font-bold  text-center text-2xl" style={{ fontWeight: 700 }}>Tu as gagné !</p></div>
+                                                    <div className="flex-shrink-0">
+                                                        {p.lot?.photo_url && (
+                                                            <Image
+                                                                src={p.lot.photo_url}
+                                                                alt={p.lot.titre}
+                                                                width={120}
+                                                                height={120}
+                                                                className="rounded-md object-cover mx-auto"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                       
+                                                        <p className=" text-center" style={{ fontWeight: 700 }}>{p.lot?.titre}</p>
+                                                        
+                                                    </div>
     <div className="mt-4">
       <Dialog>
         <DialogTrigger asChild>
@@ -188,23 +191,24 @@ export default function UserListParticipation() {
         </DialogContent>
       </Dialog>
     </div>
-                                            </>
-                                        ) : (
-                                            <div className="w-full text-center">
-                                                <p className="font-medium text-white text-2xl">Tu as perdu !</p>
-                                            </div>
-                                        )}
+                                                </>
+                                            ) : (
+                                                <div className="w-full text-center">
+                                                    <p className="font-medium text-white text-2xl">Tu as perdu !</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-center text-gray-500 py-8">
-                        Aucune participation enregistrée
-                    </p>
-                )}
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-center text-gray-500 py-8">
+                            Aucune participation enregistrée
+                        </p>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     )
 }
