@@ -162,7 +162,7 @@ export default function GamePage() {
         <main className="min-h-screen flex flex-col items-center justify-center  p-6">
             <RegistrationHeader />
             <div className="border border-white rounded-[16px] mt-[25px]">
-            <h1 className="text-[25px] text-center mb-[10px]">Tente ta chance !</h1>
+            <h1 className="text-[25px] text-center mb-[10px] mt-[25px]">Tente ta chance !</h1>
             <h2 className="text-[18px] text-center mb-[30px]">Gratte et découvre si ton ticket est gagnant !</h2>
             {accessDenied ? (
                 <div className="w-full max-w-xs text-center">
