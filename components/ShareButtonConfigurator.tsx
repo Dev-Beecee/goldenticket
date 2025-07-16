@@ -5,20 +5,19 @@ import { Button } from "@/components/ui/button";
 
 interface ShareButtonConfiguratorProps {
   userId: string; // L'identifiant de l'utilisateur inscrit
-  baseShareUrl: string; // L'URL de base à partager (ex: https://monjeu.com)
 }
 
 const BUCKET = "reglage-site";
 
-const ShareButtonConfigurator: React.FC<ShareButtonConfiguratorProps> = ({ userId, baseShareUrl }) => {
+const ShareButtonConfigurator: React.FC<ShareButtonConfiguratorProps> = ({ userId }) => {
   const [image, setImage] = useState<string>("");
   const [metaDescription, setMetaDescription] = useState<string>("");
   const [customMessage, setCustomMessage] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Génération du lien traqué
-  const trackedUrl = `${baseShareUrl}?ref=${encodeURIComponent(userId)}`;
+  // Génération du lien traqué avec l'URL fixe
+  const trackedUrl = `https://jeu-mcdo.fr/?ref=${encodeURIComponent(userId)}`;
 
   // Gestion de l'upload d'image dans Supabase Storage
   const handleImageUpload = async (file: File) => {
