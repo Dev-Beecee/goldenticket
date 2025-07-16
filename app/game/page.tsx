@@ -166,8 +166,8 @@ export default function GamePage() {
             <h2 className="text-[18px] text-center mb-[30px]">Gratte et découvre si ton ticket est gagnant !</h2>
             {accessDenied ? (
                 <div className="w-full max-w-xs text-center">
-                    <h1 className="text-2xl font-bold mb-4">Accès refusé</h1>
-                    <p className="text-gray-600">
+                    <h1 className="text-2xl font-bold mb-4 text-white">Accès refusé</h1>
+                    <p className="text-gray-600 text-white">
                         Vous devez soumettre un ticket valide contenant un menu MXBO ou Best Of pour accéder au jeu.
                     </p>
                 </div>

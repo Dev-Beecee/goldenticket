@@ -10,7 +10,7 @@ export function RegistrationConsigne() {
       {/* Première Card */}
       <Card className="border-white border bg-transparent text-center">
         <CardContent className="p-6 flex flex-col items-center gap-4">
-          <p className="text-sm font-medium text-white">Du <span style={{ fontWeight: 700 }}>17 juillet et 31 août 2025</span></p>
+          <p className="text-sm font-medium text-white">Du <span style={{ fontWeight: 700 }}>17 juillet au 31 août 2025</span></p>
           <h2 className="text-lg font-bold underline leading-snug text-white">
             1 Menu Best of ou Maxi Best Of acheté = 1 chance <br />
             de remporter un de nos nombreux lots
