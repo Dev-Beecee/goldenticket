@@ -66,8 +66,8 @@ const ShareButton: React.FC<ShareButtonProps> = ({ inscriptionId, canal, shareUr
   if (loading) return <button disabled>Chargement...</button>;
 
   return (
-    <button type="button" onClick={handleShare} style={{ padding: 8, borderRadius: 6, background: '#FFB700', color: '#222', fontWeight: 600 }}>
-      {children || 'Partager'}
+    <button type="button" onClick={handleShare} style={{ padding: 8, borderRadius: 40, background: '#fff', color: '#8A2E92', fontWeight: 600, border: '1px solid #FFBC0D', textTransform: 'uppercase' }}>
+      {children || 'Partager ce jeu À mes amis !'}
     </button>
   );
 };

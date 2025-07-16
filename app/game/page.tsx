@@ -121,7 +121,7 @@ export default function GamePage() {
                 const sc = new ScratchCard('#js--sc--container', {
                     scratchType: SCRATCH_TYPE.CIRCLE,
                     containerWidth: container.offsetWidth,
-                    containerHeight: 300,
+                    containerHeight: 310,
                     imageForwardSrc: '/mcdo-goldenticket-grat.jpg',
                     imageBackgroundSrc: imageResult,
                     htmlBackground: '',
@@ -159,7 +159,11 @@ export default function GamePage() {
     }, [scratchReady, lotLoaded, imageResult, hasWon])
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+        <main className="min-h-screen flex flex-col items-center justify-center  p-6">
+            <RegistrationHeader />
+            <div className="border border-white rounded-[16px] mt-[25px]">
+            <h1 className="text-[25px] text-center mb-[10px]">Tente ta chance !</h1>
+            <h2 className="text-[18px] text-center mb-[30px]">Gratte et découvre si ton ticket est gagnant !</h2>
             {accessDenied ? (
                 <div className="w-full max-w-xs text-center">
                     <h1 className="text-2xl font-bold mb-4">Accès refusé</h1>
@@ -182,8 +186,8 @@ export default function GamePage() {
                     {isLoading && (
                         
                         <div className="w-full max-w-xs text-center mt-4">
-                            <RegistrationHeader />
-                            <div className="flex flex-col items-center justify-center border border-white">
+                            
+                            <div className="flex flex-col items-center justify-center ">
                             <h1>Tente ta chance ! </h1>
                             <h2>Gratte et découvre si ton ticket est gagnant !</h2>
                             <div className="w-full bg-gray-300 rounded-full h-2.5 mb-2">
@@ -195,7 +199,9 @@ export default function GamePage() {
                     )}
                     <div className="sc__infos mt-4 text-center" style={{ display: 'none' }}>Progression : 0%</div>
                 </div>
+               
             )}
+             </div>
         </main>
     )
 }
