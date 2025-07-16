@@ -21,7 +21,7 @@ export default function ReglageClient({ userId, baseShareUrl }: { userId: string
                 <PeriodeJeuForm />
             </TabsContent>
             <TabsContent value="partage">
-                <ShareButtonConfigurator userId={userId} baseShareUrl={baseShareUrl} />
+                <ShareButtonConfigurator userId={userId} />
             </TabsContent>
                 <TabsContent value="config">
                     <GameConfigForm />
