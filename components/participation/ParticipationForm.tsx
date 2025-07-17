@@ -797,7 +797,7 @@ export function ParticipationForm() {
                     image_url: uploadedImageUrl,
                     ...values,
                     statut_validation: 'invalide',
-                    raison_invalide: "Votre ticket ne contient pas de menu MXBO",
+                    raison_invalide: "Votre ticket ne contient pas de Menu Best Of ou Maxi Best Of",
                     created_at: new Date().toISOString(),
                 };
                 
