@@ -28,7 +28,7 @@ export async function generateMetadata() {
   const { data } = await supabase.from('reglage_site').select('*').limit(1).single();
   return {
     title: data?.meta_title || 'Golden Tickets',
-    description: data?.meta_description || 'Participez à notre offre promotionnelle et inscrivez-vous pour courir la chance de vous faire rembourser votre achat.',
+    description: data?.meta_description || '1 Menu Best of ou Maxi Best Of acheté = 1 chance de remporter un de nos nombreux lots ',
     openGraph: {
       images: data?.image_partage_url ? [data.image_partage_url] : [],
       title: data?.meta_title,
