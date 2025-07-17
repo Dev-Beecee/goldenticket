@@ -60,8 +60,8 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!file || !typeLotId || !titre || !instructions || priorite === null || quantiteDisponible === null || !dateDistribution || !heureDistribution || !recuperation) {
-            return alert('Tous les champs sont obligatoires')
+        if (!file || !titre || !instructions || priorite === null || quantiteDisponible === null) {
+            return alert('Titre, instructions, priorité, quantité disponible et image sont obligatoires')
         }
         setLoading(true)
         try {
