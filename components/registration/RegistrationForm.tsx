@@ -77,7 +77,7 @@ export function RegistrationForm() {
     if (storedId) {
       setRegistrationId(storedId)
 
-      // Vérifier la participation
+      // Vérifier si l'utilisateur existe et rediriger immédiatement
       fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/inscription', {
         method: 'POST',
         headers: {
@@ -88,6 +88,12 @@ export function RegistrationForm() {
       })
         .then((res) => res.json())
         .then((res) => {
+          if (res.exists) {
+            // Redirection immédiate si l'utilisateur existe déjà
+            router.push(`/participation?id=${storedId}`)
+            return
+          }
+          
           if (res.participations && res.participations.length > 0) {
             setHasParticipated(true)
           }
@@ -108,7 +114,7 @@ export function RegistrationForm() {
       const value = searchParams.get(field) || '';
       form.setValue(field as keyof FormValues, value);
     });
-  }, [form, searchParams])
+  }, [form, searchParams, router])
 
   // Dans la fonction onSubmit du composant RegistrationForm
   async function onSubmit(data: FormValues) {

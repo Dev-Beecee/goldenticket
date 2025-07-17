@@ -93,7 +93,7 @@ export default function GagnerPage() {
                     >
                         Je tente encore ma chance
                     </button>
-                    <ShareButton inscriptionId="demo" canal="autre" shareUrl={typeof window !== 'undefined' ? window.location.href : ''}>
+                    <ShareButton inscriptionId="demo" canal="autre" shareUrl={typeof window !== 'undefined' ? window.location.origin + '/' : ''}>
                     Partager ce jeu À mes amis !
                     </ShareButton>
                 </div>
