@@ -51,6 +51,15 @@ export default function RootLayout({
   return (
     <ReglageSiteProvider>
       <html lang="fr" suppressHydrationWarning>
+        <head>
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-2ZBSQ74P40"></script>
+          <script dangerouslySetInnerHTML={{ __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-2ZBSQ74P40');
+          ` }} />
+        </head>
         <body className={speede.className}>
           <ReglageSiteStyleProvider>
             <ReglageSiteStyles />
