@@ -53,10 +53,10 @@ export default function DejaGagnePage() {
     }, [searchParams])
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center bg-green-50 p-6">
+        <main className="min-h-screen flex flex-col items-center justify-center p-6">
             <RegistrationHeader />
             <div className="w-full max-w-xs text-center">
-                <h1 className="text-2xl font-bold mb-4 text-green-700">Bravo !</h1>
+                <h1 className="text-2xl font-bold mb-4 text-white">Bravo !</h1>
                 {loading ? (
                     <p className="text-gray-700 mb-4">Chargement de votre lot...</p>
                 ) : error ? (
@@ -74,10 +74,10 @@ export default function DejaGagnePage() {
                                 className="mx-auto rounded shadow-md w-48 h-48 object-cover mb-4"
                             />
                         )}
-                        <h2 className="text-lg font-semibold text-green-800 mb-2">{lot.titre}</h2>
+                        <h2 className="text-lg font-semibold text-white mb-2">{lot.titre}</h2>
                         {lot.instructions && (
                             <div
-                                className="text-sm text-green-900 bg-green-100 rounded p-2 mb-2"
+                                className="text-sm text-white rounded p-2 mb-2"
                                 dangerouslySetInnerHTML={{ __html: lot.instructions }}
                             />
                         )}
