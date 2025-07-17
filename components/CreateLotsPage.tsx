@@ -82,15 +82,28 @@ export default function CreateLotsPage() {
     }
 
     const handleDeleteLot = async (lotId: string) => {
+        console.log("Début de handleDeleteLot pour lotId:", lotId);
         try {
             const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce lot ?")
+            console.log("Confirmation:", confirmation);
             if (!confirmation) return
 
+            console.log("Envoi de la requête DELETE...");
             const response = await fetch(`https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/lots?id=${lotId}`, {
                 method: "DELETE"
             })
 
-            if (!response.ok) throw new Error("Erreur lors de la suppression")
+            console.log("Réponse reçue, status:", response.status);
+            console.log("Response ok:", response.ok);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.log("Erreur response:", errorText);
+                throw new Error("Erreur lors de la suppression")
+            }
+
+            const responseData = await response.json();
+            console.log("Données de réponse:", responseData);
 
             await fetchLots()
             toast.success("Lot supprimé avec succès")
