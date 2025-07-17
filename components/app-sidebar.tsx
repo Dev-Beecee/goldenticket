@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react"
-import { GalleryVerticalEnd } from "lucide-react"
+import { GalleryVerticalEnd, LogOut } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase-client"
+import { useRouter } from "next/navigation"
 
 import {
   Sidebar,
@@ -89,6 +90,16 @@ const getNavData = (userRole: string | null) => {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push('/ghost');
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -183,6 +194,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 ) : null}
               </SidebarMenuItem>
             ))}
+          </SidebarMenu>
+        </SidebarGroup>
+        
+        {/* Bouton de déconnexion */}
+        <SidebarGroup className="mt-auto">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleLogout} className="text-red-600 hover:text-red-700">
+                <div className="flex items-center gap-2">
+                  <LogOut className="h-4 w-4" />
+                  <span>Déconnexion</span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
