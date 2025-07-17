@@ -1034,7 +1034,7 @@ export function ParticipationForm() {
                                 </Command>
                             </PopoverContent>
                         </Popover>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-white">
                             Si le restaurant n'apparaît pas, vérifiez le nom saisi ci-dessus
                         </p>
                     </div>
