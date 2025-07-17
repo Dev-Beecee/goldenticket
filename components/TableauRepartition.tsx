@@ -79,8 +79,12 @@ export default function TableauRepartition({ periode_id }: { periode_id: string 
                         {repartitions.map((r: any) => (
                             <TableRow key={r.id} className="text-black">
                                 <TableCell className="text-black">{r.date_jour}</TableCell>
-                                <TableCell className="text-black">{r.periode_jeu_lot.lot.type_lot.nom}</TableCell>
-                                <TableCell className="text-black">{r.periode_jeu_lot.lot.titre}</TableCell>
+                                <TableCell className="text-black">
+                                    {r.periode_jeu_lot?.lot?.type_lot?.nom || 'Type inconnu'}
+                                </TableCell>
+                                <TableCell className="text-black">
+                                    {r.periode_jeu_lot?.lot?.titre || 'Lot inconnu'}
+                                </TableCell>
                                 <TableCell className="text-black">{r.quantite_disponible}</TableCell>
                                 <TableCell className="text-black">{r.quantite_distribuee}</TableCell>
                             </TableRow>

@@ -103,7 +103,7 @@ export default function StatResume() {
                         <CardTitle className="text-sm text-muted-foreground">Moyenne par joueur</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-xl font-bold text-black">{stats.moyenneParJoueur}</p>
+                        <p className="text-xl font-bold text-black">{Math.round(stats.moyenneParJoueur)}</p>
                     </CardContent>
                 </Card>
 
