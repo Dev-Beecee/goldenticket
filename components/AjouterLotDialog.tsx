@@ -156,7 +156,7 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
                                 </div>
                                 <div>
                                     <Label className="text-black">Heure de distribution</Label>
-                                    <Input className="text-black" type="time" value={heureDistribution} onChange={e => setHeureDistribution(e.target.value)} required />
+                                    <Input className="text-black" type="time" value={heureDistribution} onChange={e => setHeureDistribution(e.target.value)} />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
