@@ -188,8 +188,7 @@ export default function GamePage() {
                         <div className="w-full max-w-xs text-center mt-4">
                             
                             <div className="flex flex-col items-center justify-center ">
-                            <h1>Tente ta chance ! </h1>
-                            <h2>Gratte et découvre si ton ticket est gagnant !</h2>
+                           
                             <div className="w-full bg-gray-300 rounded-full h-2.5 mb-2">
                                 <div className="bg-blue-600 h-2.5 rounded-full animate-pulse w-3/4" />
                             </div>
