@@ -67,22 +67,22 @@ export default function TableauRepartition({ periode_id }: { periode_id: string 
             <div className="border rounded-xl overflow-x-auto">
                 <Table>
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Type de lot</TableHead>
-                            <TableHead>Lot</TableHead>
-                            <TableHead>Disponible</TableHead>
-                            <TableHead>Distribué</TableHead>
+                        <TableRow className="text-black">
+                            <TableHead className="text-black">Date</TableHead>
+                            <TableHead className="text-black">Type de lot</TableHead>
+                            <TableHead className="text-black">Lot</TableHead>
+                            <TableHead className="text-black">Disponible</TableHead>
+                            <TableHead className="text-black">Distribué</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {repartitions.map((r: any) => (
-                            <TableRow key={r.id}>
-                                <TableCell>{r.date_jour}</TableCell>
-                                <TableCell>{r.periode_jeu_lot.lot.type_lot.nom}</TableCell>
-                                <TableCell>{r.periode_jeu_lot.lot.titre}</TableCell>
-                                <TableCell>{r.quantite_disponible}</TableCell>
-                                <TableCell>{r.quantite_distribuee}</TableCell>
+                            <TableRow key={r.id} className="text-black">
+                                <TableCell className="text-black">{r.date_jour}</TableCell>
+                                <TableCell className="text-black">{r.periode_jeu_lot.lot.type_lot.nom}</TableCell>
+                                <TableCell className="text-black">{r.periode_jeu_lot.lot.titre}</TableCell>
+                                <TableCell className="text-black">{r.quantite_disponible}</TableCell>
+                                <TableCell className="text-black">{r.quantite_distribuee}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

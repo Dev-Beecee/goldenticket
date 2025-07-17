@@ -190,9 +190,9 @@ export default function GamePage() {
                             <div className="flex flex-col items-center justify-center ">
                            
                             <div className="w-full bg-gray-300 rounded-full h-2.5 mb-2">
-                                <div className="bg-blue-600 h-2.5 rounded-full animate-pulse w-3/4" />
+                                <div className="bg-white h-2.5 rounded-full animate-pulse w-3/4"  />
                             </div>
-                            <p className="text-sm text-gray-600">Chargement du jeu...</p>
+                            
                             </div>
                         </div>
                     )}

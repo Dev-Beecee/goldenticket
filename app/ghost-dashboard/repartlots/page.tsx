@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase-client'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
 import TableauRepartition from '@/components/TableauRepartition'
+import CreateRepartitionForm from '@/components/CreateRepartitionForm'
 
 export default function RepartLotsPage() {
     const router = useRouter()
@@ -59,7 +60,7 @@ export default function RepartLotsPage() {
                     Définis les dates de début et de fin pendant lesquelles les lots seront attribués.
                 </p>
             </div>
-
+<CreateRepartitionForm/>
            
             
             <TableauRepartition periode_id={periodeId} />
