@@ -51,6 +51,17 @@ export default function GagnerPage() {
 
     const router = useRouter()
 
+    const handleRetry = () => {
+      if (typeof window !== 'undefined') {
+        const inscriptionId = localStorage.getItem('inscription_id');
+        if (inscriptionId) {
+          router.push(`/participation?id=${inscriptionId}`);
+        } else {
+          router.push('/');
+        }
+      }
+    };
+
   return (
         <main className="min-h-screen flex flex-col items-center justify-center ">
             <RegistrationHeader />
@@ -89,11 +100,11 @@ export default function GagnerPage() {
                     <button
                         className="font-bold py-2 px-4"
                         style={{ color: '#8A2E92', border: '1px solid white', borderRadius: 40, background: '#FFBC0D' }}
-                        onClick={() => router.push('/')}
+                        onClick={handleRetry}
                     >
                         Je tente encore ma chance
                     </button>
-                    <ShareButton inscriptionId="demo" canal="autre" shareUrl={typeof window !== 'undefined' ? window.location.origin + '/' : ''}>
+                    <ShareButton inscriptionId={inscriptionId || "demo"} canal="autre" shareUrl={typeof window !== 'undefined' ? window.location.origin + '/' : ''}>
                     Partager ce jeu À mes amis !
                     </ShareButton>
                 </div>
