@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import jsPDF from "jspdf";
-import TotalGagnantsCard from "./TotalGagnantsCard";
+
 
 type StatsType = {
     participationsParRestaurant: Record<string, number>;
@@ -153,7 +153,7 @@ export default function StatisticsDashboard() {
             {/* Section des gagnants */}
             <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-700 mb-4">Statistiques des Gagnants</h2>
-                <TotalGagnantsCard />
+               
             </div>
 
             <div className="flex gap-4">

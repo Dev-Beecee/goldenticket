@@ -42,18 +42,10 @@ export default function TotalGagnantsCard() {
 
     return (
         <div className="space-y-6">
-            <div className="flex gap-4">
-                <button
-                    onClick={fetchTotalGagnants}
-                    disabled={loading}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                >
-                    {loading ? "Chargement..." : "Actualiser le nombre de gagnants"}
-                </button>
-            </div>
+            
 
             {data && (
-                <Card className="bg-gradient-to-br from-yellow-400 to-yellow-600 text-white">
+                <Card className="bg-white shadow-md border-none text-black">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
                             Total des Gagnants
@@ -62,9 +54,7 @@ export default function TotalGagnantsCard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{data.total_gagnants}</div>
-                        <p className="text-xs text-yellow-100">
-                            Gagnants totaux depuis le début
-                        </p>
+                        
                     </CardContent>
                 </Card>
             )}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import TotalGagnantsCard from "./TotalGagnantsCard"
 
 type ResumeStats = {
     moyenneParJour: number
@@ -83,6 +84,9 @@ export default function StatResume() {
 
     return (
         <div className="flex flex-col gap-8 mt-[45px]">
+            {/* Section des gagnants */}
+            <TotalGagnantsCard />
+            
             {/* Ligne du haut : 4 cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card className="bg-white shadow-md border-none">
