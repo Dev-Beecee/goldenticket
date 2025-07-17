@@ -93,7 +93,7 @@ export function GagnantsTable() {
             </div>
 
             <div className="rounded-md border">
-                <Table>
+                <Table className="text-black">
                     <TableHeader>
                         <TableRow>
                             <TableHead>Nom</TableHead>
