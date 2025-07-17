@@ -122,7 +122,7 @@ export default function GamePage() {
                     scratchType: SCRATCH_TYPE.CIRCLE,
                     containerWidth: container.offsetWidth,
                     containerHeight: 310,
-                    imageForwardSrc: '/mcdo-goldenticket-grat.jpg',
+                    imageForwardSrc: '/mcdo-goldenticket-gratv3.jpg',
                     imageBackgroundSrc: imageResult,
                     htmlBackground: '',
                     brushSrc: imageResult,
