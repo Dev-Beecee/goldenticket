@@ -65,7 +65,7 @@ export default function GagnerPage() {
   return (
         <main className="min-h-screen flex flex-col items-center justify-center ">
             <RegistrationHeader />
-            <div className="w-full max-w-sm  text-center border border-white rounded-lg p-8">
+            <div className="w-full max-w-xs  text-center border border-white rounded-lg p-8">
                 <h1 className="text-2xl font-bold mb-4 text-white  text-[40px] leading-none">Félicitations, tu as gagné !</h1>
                 {loading ? (
                     <p className="text-white mb-4">Chargement de votre lot...</p>
