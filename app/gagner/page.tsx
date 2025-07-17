@@ -65,7 +65,7 @@ export default function GagnerPage() {
   return (
         <main className="min-h-screen flex flex-col items-center justify-center ">
             <RegistrationHeader />
-            <div className="w-full max-w-xs text-center border border-white rounded-lg">
+            <div className="w-full  text-center border border-white rounded-lg">
                 <h1 className="text-2xl font-bold mb-4 text-white">Félicitations, tu as gagné !</h1>
                 {loading ? (
                     <p className="text-white mb-4">Chargement de votre lot...</p>
@@ -83,13 +83,8 @@ export default function GagnerPage() {
                                 className="mx-auto rounded shadow-md w-48 h-48 object-cover mb-4"
                             />
                         )}
-                        <h2 className="text-lg font-semibold text-green-800 mb-2">{lot.titre}</h2>
-                        {lot.instructions && (
-                            <div
-                                className="text-sm text-green-900 bg-green-100 rounded p-2 mb-2"
-                                dangerouslySetInnerHTML={{ __html: lot.instructions }}
-                            />
-                        )}
+                        <h2 className="text-lg font-semibold text-white mb-2">{lot.titre}</h2>
+                        
                         <p className="text-white text-center mt-4">
                           Un e-mail vient de t’être envoyé avec toutes les instructions pour récupérer ton lot.
                         </p>
