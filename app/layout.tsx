@@ -27,18 +27,18 @@ export async function generateMetadata() {
   );
   const { data } = await supabase.from('reglage_site').select('*').limit(1).single();
   return {
-    title: data?.meta_title || 'Golden Tickets',
-    description: data?.meta_description || '1 Menu Best of ou Maxi Best Of acheté = 1 chance de remporter un de nos nombreux lots ',
+    title: 'Jeu Golden Ticket McDonald’s + de 20 000 cadeaux à gagner',
+    description: 'McDonald’s Guadeloupe te fait gagner + de 20 000 cadeaux avec le Golden Ticket ! 1 menu = 1 ticket à gratter, du 17 juillet au 31 août 2025.',
     openGraph: {
-      images: data?.image_partage_url ? [data.image_partage_url] : [],
-      title: data?.meta_title,
-      description: data?.meta_description,
+      images: ['/partage.jpg'],
+      title: 'Jeu Golden Ticket McDonald’s + de 20 000 cadeaux à gagner',
+      description: 'McDonald’s Guadeloupe te fait gagner + de 20 000 cadeaux avec le Golden Ticket ! 1 menu = 1 ticket à gratter, du 17 juillet au 31 août 2025.',
     },
     twitter: {
       card: 'summary_large_image',
-      title: data?.meta_title,
-      description: data?.meta_description,
-      images: data?.image_partage_url ? [data.image_partage_url] : [],
+      title: 'Jeu Golden Ticket McDonald’s + de 20 000 cadeaux à gagner',
+      description: 'McDonald’s Guadeloupe te fait gagner + de 20 000 cadeaux avec le Golden Ticket ! 1 menu = 1 ticket à gratter, du 17 juillet au 31 août 2025.',
+      images: ['/partage.jpg'],
     }
   };
 }
