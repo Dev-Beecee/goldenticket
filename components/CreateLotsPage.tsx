@@ -130,12 +130,18 @@ export default function CreateLotsPage() {
                         <div key={lot.id} className="border rounded-lg p-4 shadow-sm bg-white relative">
                             {/* Bouton de suppression */}
                             <button
-                                onClick={() => handleDeleteLot(lot.id)}
-                                className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700 transition-colors"
-                                aria-label="Supprimer le lot"
-                            >
-                                <Trash2 size={18} />
-                            </button>
+    onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Bouton cliqué pour lot:", lot.id);
+        handleDeleteLot(lot.id);
+    }}
+    className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700 transition-colors z-10"
+    aria-label="Supprimer le lot"
+    type="button"
+>
+    <Trash2 size={18} />
+</button>
 
                             <img
                                 src={lot.photo_url}
