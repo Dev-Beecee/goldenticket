@@ -63,7 +63,7 @@ export default function DejaGagnePage() {
                     <p className="text-red-600 mb-4">{error}</p>
                 ) : lot ? (
                     <>
-                        <p className="text-gray-700 mb-4">
+                        <p className="text-white mb-4">
                             Vous avez déjà gagné avec ce ticket.<br />
                             Consultez vos instructions dans votre email !
                         </p>
