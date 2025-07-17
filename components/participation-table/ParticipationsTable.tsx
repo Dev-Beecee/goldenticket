@@ -73,7 +73,12 @@ export default function ParticipationsTable({
     return (
         <div className="mb-12">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Participations</h2>
+                <div>
+                    <h2 className="text-xl font-semibold">Participations</h2>
+                    <p className="text-sm text-gray-600 mt-1">
+                        Total : {participations.length} participation{participations.length > 1 ? 's' : ''}
+                    </p>
+                </div>
                 <button
                     onClick={exportToCSV}
                     className="px-4 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800"
