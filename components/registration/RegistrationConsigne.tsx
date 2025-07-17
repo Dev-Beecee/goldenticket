@@ -42,7 +42,7 @@ export function RegistrationConsigne() {
           </p>
         </CardContent>
       </Card>
-      <h3 className="text-sm text-white" style={{ fontWeight: 700, fontSize: 20 }}>Enregistres tes informations pour participer à la loterie</h3>
+      <h3 className="text-sm text-white text-center" style={{ fontWeight: 700, fontSize: 20 }}>Enregistres tes informations pour participer à la loterie</h3>
       <p className="text-sm text-white text-center mb-[30px]">En t’inscrivant ci-dessous, tes coordonnées seront utilisées pour te contacter en cas de gain.</p>
     </div>
   );
