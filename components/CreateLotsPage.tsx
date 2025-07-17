@@ -84,7 +84,9 @@ export default function CreateLotsPage() {
     const handleDeleteLot = async (lotId: string) => {
         console.log("Début de handleDeleteLot pour lotId:", lotId);
         try {
-            const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce lot ?")
+            // const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce lot ?")
+            // if (!confirmation) return
+            const confirmation = true; // Pour tester sans confirmation
             console.log("Confirmation:", confirmation);
             if (!confirmation) return
 
