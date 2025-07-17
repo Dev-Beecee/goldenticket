@@ -126,37 +126,37 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
                             <div>
-                                <Label>Titre</Label>
+                                <Label className="text-black">Titre</Label>
                                 <Input value={titre} onChange={(e) => setTitre(e.target.value)} required />
                             </div>
                             
                             <div>
-                                <Label>Instructions</Label>
+                                <Label className="text-black">Instructions</Label>
                                 <ReactQuill value={instructions} onChange={setInstructions} style={{ height: "250px" }} />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4   mt-[45px]">
                                 <div>
-                                    <Label>Priorité</Label>
+                                    <Label className="text-black">Priorité</Label>
                                     <Input type="number" value={priorite} onChange={e => setPriorite(Number(e.target.value))} required min={0} />
                                 </div>
                                 <div>
-                                    <Label>Quantité disponible</Label>
+                                    <Label className="text-black">Quantité disponible</Label>
                                     <Input type="number" value={quantiteDisponible} onChange={e => setQuantiteDisponible(Number(e.target.value))} required min={0} />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label>Date de distribution</Label>
+                                    <Label className="text-black">Date de distribution</Label>
                                     <Input type="date" value={dateDistribution} onChange={e => setDateDistribution(e.target.value)} required />
                                 </div>
                                 <div>
-                                    <Label>Heure de distribution</Label>
+                                    <Label className="text-black">Heure de distribution</Label>
                                     <Input type="time" value={heureDistribution} onChange={e => setHeureDistribution(e.target.value)} required />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label>Récupération</Label>
+                                    <Label className="text-black">Récupération</Label>
                                     <Select value={recuperation} onValueChange={setRecuperation} required>
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Choisir une récupération" />
@@ -168,7 +168,7 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
                                     </Select>
                                 </div>
                                 <div>
-                                <Label>Type de lot</Label>
+                                <Label className="text-black">Type de lot</Label>
                                 <div className="flex items-start gap-2">
                                     <Select value={typeLotId} onValueChange={setTypeLotId} required>
                                         <SelectTrigger className="w-full">
@@ -201,7 +201,7 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
                             </div>
                             </div>
                             <div className="py-4 mt-8">
-                                <Label>Image</Label>
+                                <Label className="text-black">Image</Label>
                                 <Input type="file" accept="image/*" onChange={handleFileChange} required />
                                 {imagePreview && (
                                     <div className="">

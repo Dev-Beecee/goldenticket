@@ -82,34 +82,22 @@ export default function CreateLotsPage() {
     }
 
     const handleDeleteLot = async (lotId: string) => {
-        console.log("Début de handleDeleteLot pour lotId:", lotId);
         try {
-            // const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce lot ?")
-            // if (!confirmation) return
-            const confirmation = true; // Pour tester sans confirmation
-            console.log("Confirmation:", confirmation);
+            const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce lot ?")
             if (!confirmation) return
 
-            console.log("Envoi de la requête DELETE...");
             const response = await fetch(`https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/lots?id=${lotId}`, {
                 method: "DELETE"
             })
 
-            console.log("Réponse reçue, status:", response.status);
-            console.log("Response ok:", response.ok);
-
             if (!response.ok) {
-                const errorText = await response.text();
-                console.log("Erreur response:", errorText);
                 throw new Error("Erreur lors de la suppression")
             }
-
-            const responseData = await response.json();
-            console.log("Données de réponse:", responseData);
 
             await fetchLots()
             toast.success("Lot supprimé avec succès")
         } catch (error) {
+'use client'
             console.error("Erreur de suppression:", error)
             toast.error("Erreur lors de la suppression du lot")
         }
@@ -148,7 +136,6 @@ export default function CreateLotsPage() {
     onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log("Bouton cliqué pour lot:", lot.id);
         handleDeleteLot(lot.id);
     }}
     className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700 transition-colors z-10"
