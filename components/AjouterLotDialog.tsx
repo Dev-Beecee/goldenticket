@@ -132,7 +132,12 @@ export default function AjouterLotDialog({ typesLot, onLotAdded }: AjouterLotDia
                             
                             <div>
                                 <Label className="text-black">Instructions</Label>
-                                <ReactQuill value={instructions} onChange={setInstructions} style={{ height: "250px" }} />
+                                <ReactQuill 
+                                    value={instructions} 
+                                    onChange={setInstructions} 
+                                    style={{ height: "250px" }}
+                                    className="text-black"
+                                />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4   mt-[45px]">
                                 <div>
