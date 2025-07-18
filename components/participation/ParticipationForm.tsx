@@ -55,6 +55,7 @@ export function ParticipationForm() {
     const [ocrCompleted, setOcrCompleted] = useState(false);
     const { toast } = useToast()
     const [formattedMontant, setFormattedMontant] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
@@ -483,23 +484,42 @@ export function ParticipationForm() {
         // Nettoyage du nom pour une meilleure correspondance
         const cleanedInput = restaurantName.toLowerCase().trim();
 
-        return restaurants.find(r => {
+        // Étape 1 : Recherche de correspondance exacte
+        const exactMatch = restaurants.find(r => {
             const cleanedNom = r.nom.toLowerCase().trim();
             const cleanedCode = (r.code || '').toLowerCase().trim();
             const cleanedAcronym = (r.acronym || '').toLowerCase().trim();
-            // Correspondance exacte ou partielle sur nom, code ou acronym
+            
             return (
                 cleanedNom === cleanedInput ||
+                cleanedCode === cleanedInput ||
+                cleanedAcronym === cleanedInput
+            );
+        });
+
+        if (exactMatch) {
+            return exactMatch;
+        }
+
+        // Étape 2 : Si pas de correspondance exacte, recherche partielle plus stricte
+        const partialMatch = restaurants.find(r => {
+            const cleanedNom = r.nom.toLowerCase().trim();
+            const cleanedCode = (r.code || '').toLowerCase().trim();
+            const cleanedAcronym = (r.acronym || '').toLowerCase().trim();
+            
+            // Correspondance partielle stricte : l'input doit être contenu dans le nom/code/acronym
+            // ou le nom/code/acronym doit être contenu dans l'input (pour les cas où l'OCR détecte plus de texte)
+            return (
                 cleanedNom.includes(cleanedInput) ||
                 cleanedInput.includes(cleanedNom) ||
-                cleanedCode === cleanedInput ||
                 cleanedCode.includes(cleanedInput) ||
                 cleanedInput.includes(cleanedCode) ||
-                cleanedAcronym === cleanedInput ||
                 cleanedAcronym.includes(cleanedInput) ||
                 cleanedInput.includes(cleanedAcronym)
             );
         });
+
+        return partialMatch;
     }, [restaurants]);
 
     // Auto-remplissage avec OCR
@@ -620,30 +640,31 @@ export function ParticipationForm() {
     }, [ocrCompleted, form]);
 
     const onSubmit = async (values: FormValues) => {
-        if (!uploadedImageUrl || !inscriptionId) {
+        if (isSubmitting) {
             toast({
-                title: 'Erreur',
-                description: 'Image ou ID manquant',
-                variant: 'destructive'
+                title: 'En cours...',
+                description: 'Veuillez patienter, traitement en cours.',
+                variant: 'default',
             });
             return;
         }
-
+        
+        setIsSubmitting(true);
         setIsProcessing(true);
-
+        
         try {
-            // ✅ Vérification de doublon
+            // Normaliser les données pour une comparaison plus stricte
+            const normalizedData = {
+                ocr_restaurant: values.ocr_restaurant.trim().toLowerCase(),
+                ocr_date_achat: values.ocr_date_achat,
+                ocr_heure_achat: values.ocr_heure_achat,
+                ocr_montant: parseFloat(values.ocr_montant).toFixed(2),
+            };
+
             const duplicateCheck = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/check-duplicate-participation', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    ocr_restaurant: values.ocr_restaurant,
-                    ocr_date_achat: values.ocr_date_achat,
-                    ocr_heure_achat: values.ocr_heure_achat,
-                    ocr_montant: values.ocr_montant,
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(normalizedData),
             });
 
             if (!duplicateCheck.ok) {
@@ -651,7 +672,163 @@ export function ParticipationForm() {
             }
 
             const duplicateResult = await duplicateCheck.json();
-            if (duplicateResult.isDuplicate) {
+
+            // 2. Si pas de doublon, insertion
+            if (!duplicateResult.isDuplicate) {
+                // ✅ Vérifie la validité de la date via l'Edge Function
+                const checkRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/check-periode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ocr_date_achat: values.ocr_date_achat }),
+                });
+
+                if (!checkRes.ok) {
+                    const result = await checkRes.json();
+                    
+                    // ✅ Enregistre la participation rejetée avec statut 'invalide'
+                    const participationData = {
+                        inscription_id: inscriptionId,
+                        image_url: uploadedImageUrl,
+                        ...values,
+                        statut_validation: 'invalide',
+                        raison_invalide: result?.error || "La date d'achat ne correspond pas à la période du jeu",
+                        created_at: new Date().toISOString(),
+                    };
+                    
+                    // Supprimer le champ id s'il existe
+                    if ('id' in participationData) {
+                        delete participationData.id;
+                    }
+                    
+                    const { error: insertError } = await supabase.from('participation').insert([participationData]);
+                    if (insertError) {
+                        console.error('Erreur lors de l\'enregistrement de la participation invalide:', insertError);
+                    }
+
+                    toast({
+                        title: 'Date invalide',
+                        description: result?.error
+                            ? result.error
+                            : "La date d'achat ne correspond pas à la période du jeu. Veuillez vérifier votre ticket.",
+                        variant: 'destructive',
+                    });
+
+                    setIsProcessing(false);
+                    return;
+                }
+
+                // ✅ Enregistre la participation via la nouvelle Edge Function
+                const participationPayload = {
+                    inscription_id: inscriptionId,
+                    image_url: uploadedImageUrl,
+                    ...values,
+                    statut_validation: 'validéia', // Ajout du statut pour les participations validées par l'OCR
+                };
+
+                // Juste avant l'envoi
+                if ('id' in participationPayload) {
+                    delete participationPayload.id;
+                }
+
+                // Dans le onSubmit, s'assurer que le montant est bien formaté à 2 décimales
+                values.ocr_montant = parseFloat(values.ocr_montant).toFixed(2);
+
+                const participationRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(participationPayload),
+                });
+
+                if (!participationRes.ok) {
+                    const error = await participationRes.json();
+                    throw new Error(error.message || 'Erreur lors de l\'enregistrement');
+                }
+
+                const result = await participationRes.json();
+
+                // On récupère l'id de participation de façon robuste
+                let participationId = null;
+                if (result.participation_id) {
+                    participationId = result.participation_id;
+                } else if (result.id) {
+                    participationId = result.id;
+                } else if (result.data && result.data.id) {
+                    participationId = result.data.id;
+                }
+
+                // Fallback : si toujours pas d'id, on regarde dans le localStorage (rare)
+                if (!participationId && typeof window !== 'undefined') {
+                    participationId = localStorage.getItem('last_participation_id');
+                }
+
+                // On stocke l'id pour le cas où l'API ne le renverrait pas la prochaine fois
+                if (participationId && typeof window !== 'undefined') {
+                    localStorage.setItem('last_participation_id', participationId);
+                }
+
+                // ✅ Redirection ou message selon contient_menu_mxbo
+                if (values.contient_menu_mxbo) {
+                    // Nouvelle logique : si déjà gagné, redirige vers deja-gagne
+                    if (result.result === 'Déjà joué' && result.gain === true && participationId) {
+                        router.push(`/deja-gagne?id=${participationId}`)
+                    } else if (participationId) {
+                        router.push(`/game?id=${participationId}`);
+                    } else {
+                        toast({
+                            title: 'Erreur',
+                            description: 'Impossible de retrouver l\'identifiant de participation.',
+                            variant: 'destructive',
+                        });
+                    }
+                } else {
+                    // ✅ Enregistre la participation rejetée avec statut 'invalide'
+                    const participationData = {
+                        inscription_id: inscriptionId,
+                        image_url: uploadedImageUrl,
+                        ...values,
+                        statut_validation: 'invalide',
+                        raison_invalide: "Votre ticket ne contient pas de Menu Best Of ou Maxi Best Of",
+                        created_at: new Date().toISOString(),
+                    };
+                    
+                    // Supprimer le champ id s'il existe
+                    if ('id' in participationData) {
+                        delete participationData.id;
+                    }
+                    
+                    const { error: insertError } = await supabase.from('participation').insert([participationData]);
+                    if (insertError) {
+                        console.error('Erreur lors de l\'enregistrement de la participation invalide:', insertError);
+                    }
+
+                    toast({
+                        title: 'Désolé',
+                        description: 'Votre ticket ne contient pas de menu MXBO, vous ne pouvez pas participer au jeu',
+                        variant: 'destructive',
+                    });
+                }
+
+                // Reset
+                form.reset({
+                    ocr_restaurant: '',
+                    ocr_date_achat: '',
+                    ocr_montant: '',
+                    ocr_heure_achat: '',
+                    contient_menu_mxbo: false,
+                    id: '',
+                });
+                setImage(null);
+                setImagePreview(null);
+                setUploadedImageUrl(null);
+                setShowRestaurantSelect(false);
+                setAutoDetectedRestaurant(null);
+                setOcrCompleted(false);
+
+            } else {
                 // ✅ Enregistre la participation rejetée avec statut 'invalide'
                 const participationData = {
                     inscription_id: inscriptionId,
@@ -681,159 +858,6 @@ export function ParticipationForm() {
                 return;
             }
 
-            // ✅ Vérifie la validité de la date via l'Edge Function
-            const checkRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/check-periode', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ocr_date_achat: values.ocr_date_achat }),
-            });
-
-            if (!checkRes.ok) {
-                const result = await checkRes.json();
-                
-                // ✅ Enregistre la participation rejetée avec statut 'invalide'
-                const participationData = {
-                    inscription_id: inscriptionId,
-                    image_url: uploadedImageUrl,
-                    ...values,
-                    statut_validation: 'invalide',
-                    raison_invalide: result?.error || "La date d'achat ne correspond pas à la période du jeu",
-                    created_at: new Date().toISOString(),
-                };
-                
-                // Supprimer le champ id s'il existe
-                if ('id' in participationData) {
-                    delete participationData.id;
-                }
-                
-                const { error: insertError } = await supabase.from('participation').insert([participationData]);
-                if (insertError) {
-                    console.error('Erreur lors de l\'enregistrement de la participation invalide:', insertError);
-                }
-
-                toast({
-                    title: 'Date invalide',
-                    description: result?.error
-                        ? result.error
-                        : "La date d'achat ne correspond pas à la période du jeu. Veuillez vérifier votre ticket.",
-                    variant: 'destructive',
-                });
-
-                setIsProcessing(false);
-                return;
-            }
-
-            // ✅ Enregistre la participation via la nouvelle Edge Function
-            const participationPayload = {
-                inscription_id: inscriptionId,
-                image_url: uploadedImageUrl,
-                ...values,
-                statut_validation: 'validéia', // Ajout du statut pour les participations validées par l'OCR
-            };
-
-            // Juste avant l'envoi
-            if ('id' in participationPayload) {
-                delete participationPayload.id;
-            }
-
-            // Dans le onSubmit, s'assurer que le montant est bien formaté à 2 décimales
-            values.ocr_montant = parseFloat(values.ocr_montant).toFixed(2);
-
-            const participationRes = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/participation', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(participationPayload),
-            });
-
-            if (!participationRes.ok) {
-                const error = await participationRes.json();
-                throw new Error(error.message || 'Erreur lors de l\'enregistrement');
-            }
-
-            const result = await participationRes.json();
-
-            // On récupère l'id de participation de façon robuste
-            let participationId = null;
-            if (result.participation_id) {
-                participationId = result.participation_id;
-            } else if (result.id) {
-                participationId = result.id;
-            } else if (result.data && result.data.id) {
-                participationId = result.data.id;
-            }
-
-            // Fallback : si toujours pas d'id, on regarde dans le localStorage (rare)
-            if (!participationId && typeof window !== 'undefined') {
-                participationId = localStorage.getItem('last_participation_id');
-            }
-
-            // On stocke l'id pour le cas où l'API ne le renverrait pas la prochaine fois
-            if (participationId && typeof window !== 'undefined') {
-                localStorage.setItem('last_participation_id', participationId);
-            }
-
-            // ✅ Redirection ou message selon contient_menu_mxbo
-            if (values.contient_menu_mxbo) {
-                // Nouvelle logique : si déjà gagné, redirige vers deja-gagne
-                if (result.result === 'Déjà joué' && result.gain === true && participationId) {
-                    router.push(`/deja-gagne?id=${participationId}`)
-                } else if (participationId) {
-                    router.push(`/game?id=${participationId}`);
-                } else {
-                    toast({
-                        title: 'Erreur',
-                        description: 'Impossible de retrouver l\'identifiant de participation.',
-                        variant: 'destructive',
-                    });
-                }
-            } else {
-                // ✅ Enregistre la participation rejetée avec statut 'invalide'
-                const participationData = {
-                    inscription_id: inscriptionId,
-                    image_url: uploadedImageUrl,
-                    ...values,
-                    statut_validation: 'invalide',
-                    raison_invalide: "Votre ticket ne contient pas de Menu Best Of ou Maxi Best Of",
-                    created_at: new Date().toISOString(),
-                };
-                
-                // Supprimer le champ id s'il existe
-                if ('id' in participationData) {
-                    delete participationData.id;
-                }
-                
-                const { error: insertError } = await supabase.from('participation').insert([participationData]);
-                if (insertError) {
-                    console.error('Erreur lors de l\'enregistrement de la participation invalide:', insertError);
-                }
-
-                toast({
-                    title: 'Désolé',
-                    description: 'Votre ticket ne contient pas de menu MXBO, vous ne pouvez pas participer au jeu',
-                    variant: 'destructive',
-                });
-            }
-
-            // Reset
-            form.reset({
-                ocr_restaurant: '',
-                ocr_date_achat: '',
-                ocr_montant: '',
-                ocr_heure_achat: '',
-                contient_menu_mxbo: false,
-                id: '',
-            });
-            setImage(null);
-            setImagePreview(null);
-            setUploadedImageUrl(null);
-            setShowRestaurantSelect(false);
-            setAutoDetectedRestaurant(null);
-            setOcrCompleted(false);
-
         } catch (error) {
             toast({
                 title: 'Erreur',
@@ -841,6 +865,7 @@ export function ParticipationForm() {
                 variant: 'destructive'
             });
         } finally {
+            setIsSubmitting(false);
             setIsProcessing(false);
         }
     };
