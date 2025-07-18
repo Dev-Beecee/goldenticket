@@ -119,14 +119,14 @@ export default function InscriptionsTable({ inscriptions }: InscriptionsTablePro
                         onClick={handlePrevious}
                         disabled={currentPage === 1}
                         className={`px-4 py-2 text-sm font-medium rounded-md ${currentPage === 1
-                            ? "bg-gray-200 text-gray-500"
-                            : "bg-indigo-600 text-white hover:bg-indigo-700"
+                            ? "bg-gray-200 text-black"
+                            : "bg-indigo-600 text-black hover:bg-indigo-600"
                             }`}
                     >
                         Précédent
                     </button>
 
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-black">
                         Page {currentPage} sur {totalPages}
                     </span>
 
@@ -134,8 +134,8 @@ export default function InscriptionsTable({ inscriptions }: InscriptionsTablePro
                         onClick={handleNext}
                         disabled={currentPage === totalPages}
                         className={`px-4 py-2 text-sm font-medium rounded-md ${currentPage === totalPages
-                            ? "bg-gray-200 text-gray-500"
-                            : "bg-indigo-600 text-white hover:bg-indigo-700"
+                            ? "bg-gray-200 text-black"
+                            : "bg-indigo-600 text-black hover:bg-indigo-600"
                             }`}
                     >
                         Suivant

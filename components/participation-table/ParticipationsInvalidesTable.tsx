@@ -238,11 +238,12 @@ export default function ParticipationsInvalidesTable({
                         disabled={currentPage === 1}
                         variant="outline"
                         size="sm"
+                        className="text-black hover:bg-transparent hover:text-black"
                     >
                         Précédent
                     </Button>
 
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-black">
                         Page {currentPage} sur {totalPages} ({participations.length} total)
                     </span>
 
@@ -251,6 +252,7 @@ export default function ParticipationsInvalidesTable({
                         disabled={currentPage === totalPages}
                         variant="outline"
                         size="sm"
+                        className="text-black hover:bg-transparent hover:text-black"
                     >
                         Suivant
                     </Button>
