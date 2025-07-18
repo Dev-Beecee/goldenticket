@@ -127,16 +127,18 @@ export function GagnantsTable() {
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                     variant="outline"
+                    className="text-black hover:bg-transparent hover:text-black"
                 >
                     Précédent
                 </Button>
-                <span>
+                <span className="text-black">
                     Page {currentPage} sur {totalPages}
                 </span>
                 <Button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
                     variant="outline"
+                    className="text-black hover:bg-transparent hover:text-black"
                 >
                     Suivant
                 </Button>

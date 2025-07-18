@@ -95,16 +95,16 @@ export default function RestaurantCrud() {
       <h2 className="text-2xl font-bold mb-4">Gestion des restaurants</h2>
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         <div>
-          <Label htmlFor="nom">Nom</Label>
-          <Input id="nom" value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))} required disabled={loading} />
+          <Label htmlFor="nom" className="text-black">Nom</Label>
+          <Input id="nom" value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))} required disabled={loading} className="text-black" />
         </div>
         <div>
-          <Label htmlFor="code">Code</Label>
-          <Input id="code" value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} required disabled={loading} />
+          <Label htmlFor="code" className="text-black">Code</Label>
+          <Input id="code" value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} required disabled={loading} className="text-black" />
         </div>
         <div>
-          <Label htmlFor="acronym">Acronyme</Label>
-          <Input id="acronym" value={form.acronym} onChange={e => setForm(f => ({ ...f, acronym: e.target.value }))} required disabled={loading} />
+          <Label htmlFor="acronym" className="text-black">Acronyme</Label>
+          <Input id="acronym" value={form.acronym} onChange={e => setForm(f => ({ ...f, acronym: e.target.value }))} required disabled={loading} className="text-black" />
         </div>
         <Button type="submit" disabled={loading}>
           {editId ? "Modifier" : "Ajouter"}
@@ -119,18 +119,18 @@ export default function RestaurantCrud() {
       <table className="min-w-full bg-white border border-gray-200 rounded-md">
         <thead>
           <tr>
-            <th className="px-4 py-2 border-b">Nom</th>
-            <th className="px-4 py-2 border-b">Code</th>
-            <th className="px-4 py-2 border-b">Acronyme</th>
-            <th className="px-4 py-2 border-b">Actions</th>
+            <th className="px-4 py-2 border-b text-black">Nom</th>
+            <th className="px-4 py-2 border-b text-black">Code</th>
+            <th className="px-4 py-2 border-b text-black">Acronyme</th>
+            <th className="px-4 py-2 border-b text-black">Actions</th>
           </tr>
         </thead>
         <tbody>
           {restaurants.map(r => (
             <tr key={r.id}>
-              <td className="px-4 py-2 border-b">{r.nom}</td>
-              <td className="px-4 py-2 border-b">{r.code}</td>
-              <td className="px-4 py-2 border-b">{r.acronym}</td>
+              <td className="px-4 py-2 border-b text-black">{r.nom}</td>
+              <td className="px-4 py-2 border-b text-black">{r.code}</td>
+              <td className="px-4 py-2 border-b text-black">{r.acronym}</td>
               <td className="px-4 py-2 border-b space-x-2">
                 <Button type="button" variant="outline" onClick={() => handleEdit(r)} disabled={loading}>Éditer</Button>
                 <Button type="button" variant="destructive" onClick={() => handleDelete(r.id)} disabled={loading}>Supprimer</Button>
@@ -139,7 +139,7 @@ export default function RestaurantCrud() {
           ))}
           {restaurants.length === 0 && (
             <tr>
-              <td colSpan={4} className="text-center py-4 text-gray-500">Aucun restaurant</td>
+              <td colSpan={4} className="text-center py-4 text-black">Aucun restaurant</td>
             </tr>
           )}
         </tbody>
