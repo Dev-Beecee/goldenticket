@@ -119,6 +119,7 @@ export function RegistrationForm() {
   // Dans la fonction onSubmit du composant RegistrationForm
   async function onSubmit(data: FormValues) {
     try {
+      data.telephone = data.telephone.replace(/[\s.-]/g, '');
       const res = await fetch('https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/inscription', {
         method: 'POST',
         headers: {

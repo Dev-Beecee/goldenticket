@@ -38,44 +38,16 @@ type Participation = {
     inscription: Inscription
 }
 
+type DashboardClientProps = {
+    participationCount: number;
+    inscriptionCount: number;
+};
+
 export default function DashboardClient({
-    participations: initialParticipations,
-    inscriptions,
-}: {
-    participations: Participation[]
-    inscriptions: Inscription[]
-}) {
-    const [participations, setParticipations] = useState<Participation[]>(initialParticipations)
-    const [searchTerm, setSearchTerm] = useState('')
-    const [selectedImage, setSelectedImage] = useState<string | null>(null)
-    const [isModalOpen, setIsModalOpen] = useState(false)
-
-    const supabase = createClientComponentClient<Database>()
-
-    const updateParticipationStatus = async (id: string, newStatus: string) => {
-        const { error } = await supabase
-            .from('participation')
-            .update({ statut_validation: newStatus })
-            .eq('id', id)
-
-        if (!error) {
-            setParticipations((prev) =>
-                prev.map((p) => (p.id === id ? { ...p, statut_validation: newStatus } : p))
-            )
-        }
-    }
-
-    const searchLower = searchTerm.toLowerCase()
-
-    const filteredParticipations = participations.filter((p) => {
-        const { nom, prenom, email } = p.inscription
-        return (
-            nom.toLowerCase().includes(searchLower) ||
-            prenom.toLowerCase().includes(searchLower) ||
-            email.toLowerCase().includes(searchLower)
-        )
-    })
-
+    participationCount,
+    inscriptionCount,
+}: DashboardClientProps) {
+    // Utilisez participationCount et inscriptionCount pour afficher les données
     return (
         <div className="flex flex-1 flex-col gap-4 p-4">
             <div className="flex justify-center p-4">
@@ -87,19 +59,17 @@ export default function DashboardClient({
             <div className="grid auto-rows-min gap-4 md:grid-cols-2">
                 <StatCard
                     title="Participations"
-                    value={filteredParticipations.length}
+                    value={participationCount}
                     percentage={5.2}
-                    data={[100, 110, 105, 103, 115, 120, filteredParticipations.length]}
+                    data={[100, 110, 105, 103, 115, 120, participationCount]}
                 />
                 <StatCard
                     title="Inscriptions"
-                    value={inscriptions.length}
+                    value={inscriptionCount}
                     percentage={3.1}
-                    data={[80, 95, 85, 90, 92, 100, inscriptions.length]}
+                    data={[80, 95, 85, 90, 92, 100, inscriptionCount]}
                 />
             </div>
-
-            {/* Tu peux ajouter ici ta table des participations, les boutons de validation, modals, etc. */}
         </div>
-    )
+    );
 }

@@ -23,23 +23,25 @@ export default async function GhostDashboard() {
         redirect('/unauthorized')
     }
 
-    const { data: participationsData, error: participationError } = await supabase
-        .from('participation')
-        .select('*, restaurant(*), inscription(*)')
-        .order('created_at', { ascending: false })
+    const res = await fetch(`https://vnmijcjshzwwpbzjqgwx.supabase.co/functions/v1/get-dashboard-data`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'apikey': process.env.SUPABASE_ANON_KEY!,
+            'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+        },
+        cache: 'no-store',
+    });
 
-    const { data: inscriptionsData, error: inscriptionError } = await supabase
-        .from('inscription')
-        .select('*')
-        .order('created_at', { ascending: false })
+    const { participationCount, inscriptionCount } = await res.json();
 
     return (
         <DashboardLayout>
             <DashboardClient
-                participations={participationsData || []}
-                inscriptions={inscriptionsData || []}
+                participationCount={participationCount}
+                inscriptionCount={inscriptionCount}
             />
             <StatResume />
         </DashboardLayout>
-    )
+    );
 }
