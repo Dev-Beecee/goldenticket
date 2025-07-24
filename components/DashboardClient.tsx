@@ -41,11 +41,19 @@ type Participation = {
 type DashboardClientProps = {
     participationCount: number;
     inscriptionCount: number;
+    participationToday: number;
+    participationYesterday: number;
+    inscriptionToday: number;
+    inscriptionYesterday: number;
 };
 
 export default function DashboardClient({
     participationCount,
     inscriptionCount,
+    participationToday,
+    participationYesterday,
+    inscriptionToday,
+    inscriptionYesterday,
 }: DashboardClientProps) {
     // Utilisez participationCount et inscriptionCount pour afficher les données
     return (
@@ -60,13 +68,15 @@ export default function DashboardClient({
                 <StatCard
                     title="Participations"
                     value={participationCount}
-                    percentage={5.2}
+                    today={participationToday}
+                    yesterday={participationYesterday}
                     data={[100, 110, 105, 103, 115, 120, participationCount]}
                 />
                 <StatCard
                     title="Inscriptions"
                     value={inscriptionCount}
-                    percentage={3.1}
+                    today={inscriptionToday}
+                    yesterday={inscriptionYesterday}
                     data={[80, 95, 85, 90, 92, 100, inscriptionCount]}
                 />
             </div>

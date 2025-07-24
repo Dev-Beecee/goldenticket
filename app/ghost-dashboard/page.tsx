@@ -33,13 +33,24 @@ export default async function GhostDashboard() {
         cache: 'no-store',
     });
 
-    const { participationCount, inscriptionCount } = await res.json();
+    const { 
+        participationCount, 
+        inscriptionCount, 
+        participationToday, 
+        participationYesterday, 
+        inscriptionToday, 
+        inscriptionYesterday 
+    } = await res.json();
 
     return (
         <DashboardLayout>
             <DashboardClient
                 participationCount={participationCount}
                 inscriptionCount={inscriptionCount}
+                participationToday={participationToday}
+                participationYesterday={participationYesterday}
+                inscriptionToday={inscriptionToday}
+                inscriptionYesterday={inscriptionYesterday}
             />
             <StatResume />
         </DashboardLayout>

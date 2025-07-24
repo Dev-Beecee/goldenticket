@@ -8,6 +8,7 @@ import { Database } from "@/types/database"
 import DashboardLayout from '@/components/layouts/DashboardLayout'
 import { GagnantsTable } from "@/components/GagnantsTable"
 import { checkPermission } from "@/lib/server/permit-wrapper"
+import TotalGagnantsCard from "@/components/statistique/TotalGagnantsCard"
 
 export default async function GagnantsPage() {
     const supabase = createServerComponentClient<Database>({
@@ -39,7 +40,7 @@ export default async function GagnantsPage() {
 
         <DashboardLayout>
             <h1 className="text-2xl font-bold mb-4 text-black">Gagnants</h1>
-
+            <TotalGagnantsCard />
             <GagnantsTable />
 
         </DashboardLayout >
