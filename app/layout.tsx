@@ -8,6 +8,7 @@ import DynamicBackgroundWrapper from '@/components/DynamicBackgroundWrapper';
 import { ReglageSiteProvider } from "@/hooks/useReglageSite";
 import { ReglageSiteStyles } from '@/components/ReglageSiteStyles';
 import { ReglageSiteStyleProvider } from '@/components/ReglageSiteStyleProvider';
+import { AuthProvider } from '@/hooks/useAuth';
 import localFont from 'next/font/local';
 
 const speede = localFont({
@@ -61,16 +62,18 @@ export default function RootLayout({
           ` }} />
         </head>
         <body className={speede.className}>
-          <ReglageSiteStyleProvider>
-            <ReglageSiteStyles />
-            <DynamicBackgroundWrapper>
-              <Suspense fallback={null}>
-                {children}
-                <Footer />
-              </Suspense>
-              <Toaster />
-            </DynamicBackgroundWrapper>
-          </ReglageSiteStyleProvider>
+          <AuthProvider>
+            <ReglageSiteStyleProvider>
+              <ReglageSiteStyles />
+              <DynamicBackgroundWrapper>
+                <Suspense fallback={null}>
+                  {children}
+                  <Footer />
+                </Suspense>
+                <Toaster />
+              </DynamicBackgroundWrapper>
+            </ReglageSiteStyleProvider>
+          </AuthProvider>
         </body>
       </html>
     </ReglageSiteProvider>

@@ -3,49 +3,44 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase-client"
+import { useAuth } from "@/hooks/useAuth"
 import AjouterLotDialog from "@/components/AjouterLotDialog"
 import { Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
     Dialog,
-    DialogTrigger,
     DialogContent,
     DialogHeader,
-    DialogTitle
+    DialogTitle,
+    DialogDescription,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
-type Lot = {
-    id: string
-    titre: string
-    type_valeur: string
-    photo_url: string
-    type_lot_id: string
-    instructions?: string
-    quantite_disponible: number
-    priorite: number
-    date_distribution?: string
-    heure_distribution?: string
-    recuperation?: string
-}
-
-type TypeLot = {
+interface Lot {
     id: string
     nom: string
-    priorite: number
+    quantite: number
+    type_lot_id: string
+    instructions: string
+    image?: string
+}
+
+interface TypeLot {
+    id: string
+    nom: string
+    couleur: string
 }
 
 export default function CreateLotsPage() {
     const router = useRouter()
+    const { user, loading: authLoading } = useAuth()
     const [lots, setLots] = useState<Lot[]>([])
     const [typesLot, setTypesLot] = useState<TypeLot[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const fetchData = async () => {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser()
+            if (authLoading) return // Attendre que l'authentification soit résolue
 
             if (!user || !user.email?.endsWith("@beecee.fr")) {
                 router.push("/login")
@@ -68,7 +63,7 @@ export default function CreateLotsPage() {
         }
 
         fetchData()
-    }, [router])
+    }, [user, authLoading, router])
 
     const fetchLots = async () => {
         try {
@@ -97,7 +92,6 @@ export default function CreateLotsPage() {
             await fetchLots()
             toast.success("Lot supprimé avec succès")
         } catch (error) {
-'use client'
             console.error("Erreur de suppression:", error)
             toast.error("Erreur lors de la suppression du lot")
         }

@@ -66,7 +66,10 @@ export default function Login() {
 
             // ⏫ Mise à jour session pour SSR
             const supabaseBrowserClient = createPagesBrowserClient<Database>()
-            await supabaseBrowserClient.auth.setSession(data.session)
+            await supabaseBrowserClient.auth.setSession({
+                access_token: data.session.access_token,
+                refresh_token: data.session.refresh_token
+            })
 
             console.log("[SESSION] Session mise à jour. Redirection.")
             router.replace("/ghost-dashboard")
