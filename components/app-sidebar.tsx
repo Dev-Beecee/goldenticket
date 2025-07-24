@@ -56,6 +56,7 @@ const getNavData = (userRole: string | null) => {
       title: "Répartition des lots",
       url: "/ghost-dashboard/repartlots",
     },
+  
     {
       title: "Restaurants",
       url: "/ghost-dashboard/restaurants",

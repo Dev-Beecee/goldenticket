@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase-client'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
-import TableauRepartition from '@/components/TableauRepartition'
-import CreateRepartitionForm from '@/components/CreateRepartitionForm'
+import RepartitionLotJourSecoursCrud from '@/components/RepartitionLotJourSecoursCrud'
 
 export default function RepartLotsPage() {
     const router = useRouter()
@@ -54,16 +53,10 @@ export default function RepartLotsPage() {
 
     return (
         <DashboardLayout>
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-black">Configurer la période de jeu</h1>
-                <p className="text-sm text-muted-foreground">
-                    Définis les dates de début et de fin pendant lesquelles les lots seront attribués.
-                </p>
-            </div>
-<CreateRepartitionForm/>
+            
            
             
-            <TableauRepartition periode_id={periodeId} />
+<RepartitionLotJourSecoursCrud />
         </DashboardLayout>
     )
 }

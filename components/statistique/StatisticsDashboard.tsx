@@ -80,15 +80,6 @@ export default function StatisticsDashboard() {
 
         y += 10;
         doc.setFontSize(14);
-        doc.text("Participations par restaurant :", 10, y += 10);
-        doc.setFontSize(12);
-        for (const [restaurant, count] of Object.entries(stats.participationsParRestaurant)) {
-            doc.text(`- ${restaurant} : ${count}`, 10, y += 6);
-            if (y > 280) { doc.addPage(); y = 10; }
-        }
-
-        y += 10;
-        doc.setFontSize(14);
         doc.text("Participations par jour :", 10, y += 10);
         doc.setFontSize(12);
         for (const [date, count] of Object.entries(stats.participationsParJour)) {
@@ -185,7 +176,7 @@ export default function StatisticsDashboard() {
                     </div>
 
                     <div className="bg-white rounded-lg shadow-md p-6 space-y-2 col-span-full">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Participations par jour</h3>
+                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Participations valides par jour</h3>
                         <ul className="space-y-1 text-sm">
                             {Object.entries(stats.participationsParJour).map(([date, count]) => {
                                 const parsedDate = new Date(date);
@@ -202,14 +193,7 @@ export default function StatisticsDashboard() {
                         </ul>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-md p-6 space-y-2 col-span-full">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Participations par restaurant</h3>
-                        <ul className="space-y-1 text-sm">
-                            {Object.entries(stats.participationsParRestaurant).map(([name, count]) => (
-                                <li className="text-black" key={name}>{name} : {count}</li>
-                            ))}
-                        </ul>
-                    </div>
+
 
                     {/* UTM */}
                     {stats.utm && (
