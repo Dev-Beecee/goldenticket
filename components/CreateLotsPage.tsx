@@ -13,22 +13,29 @@ import {
     DialogHeader,
     DialogTitle,
     DialogDescription,
+    DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
 interface Lot {
     id: string
-    nom: string
-    quantite: number
+    titre: string
+    photo_url: string
     type_lot_id: string
     instructions: string
-    image?: string
+    priorite: number
+    quantite_disponible: number
+    date_distribution?: string
+    heure_distribution?: string
+    recuperation?: string
+    type_valeur?: string
 }
 
 interface TypeLot {
     id: string
     nom: string
-    couleur: string
+    priorite: number
+    instructions?: string
 }
 
 export default function CreateLotsPage() {
