@@ -376,7 +376,9 @@ export function GagnantsTable() {
                                 <TableCell>{gagnant.telephone}</TableCell>
                                 <TableCell>{gagnant.lot_titre}</TableCell>
                                 <TableCell>
-                                    {new Date(gagnant.date_attribution).toLocaleString()}
+                                    {new Date(gagnant.date_attribution).toLocaleString('fr-FR', {
+                                        timeZone: 'America/Martinique',
+                                    })}
                                 </TableCell>
                                 <TableCell>
                                     <Select
